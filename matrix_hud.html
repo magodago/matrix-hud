@@ -28,7 +28,9 @@ body { background: #000; font-family: 'Share Tech Mono', monospace; color: #fff;
 .header .status-bar { margin-left:auto; display:flex; align-items:center; gap:8px; font-size:10px; color:rgba(255,255,255,0.35); }
 .status-dot { width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse-dot 2s infinite; }
 @keyframes pulse-dot { 0%,100%{opacity:1;box-shadow:0 0 6px var(--gold)} 50%{opacity:0.3;box-shadow:0 0 2px var(--gold)} }
-.agents-grid { position:relative; z-index:2; display:grid; grid-template-columns:repeat(5,1fr); gap:8px; padding:8px 10px; height:calc(100vh - 50px); }
+.agents-grid { position:relative; z-index:2; display:grid; grid-template-columns:repeat(5,1fr); gap:8px; padding:8px 10px; height:calc(100vh - 50px); overflow-y:auto; }
+.agents-grid::-webkit-scrollbar { width:4px; }
+.agents-grid::-webkit-scrollbar-thumb { background:rgba(212,175,55,0.2); border-radius:2px; }
 /* CARD */
 .agent-card { background:var(--card-bg); border:1px solid rgba(212,175,55,0.06); border-radius:8px; display:flex; flex-direction:column; overflow:hidden; transition:all 0.3s, transform 0.15s; position:relative; cursor:default; will-change:transform; transform-style:preserve-3d; perspective:800px; }
 .agent-card:hover { border-color:rgba(212,175,55,0.15); }
