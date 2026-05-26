@@ -1,74 +1,99 @@
 #!/usr/bin/env python3
-"""Matrix HUD Server — Serves agent monitor + status API.
-Deployable on Render.com or localhost."""
-import json, os, socket
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse
+"""Matrix HUD Server — Serves the agent monitor widget + status API."""
 
-BASE = os.path.dirname(os.path.abspath(__file__))
-HUD_FILE = os.path.join(BASE, 'matrix_hud.html')
-STATUS_FILE = os.path.join(BASE, 'agent_status.json')
-PORT = int(os.environ.get('PORT', 3333))
+import json
+import os
+import socket
+import webbrowser
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlparse, parse_qs
+
+HUD_FILE = os.path.join(os.path.dirname(__file__), 'matrix_hud.html')
+STATUS_FILE = os.path.join(os.path.dirname(__file__), 'agent_status.json')
+PORT = 3333
 
 # Initial status
 initial_status = [
     {"agent": "neo", "status": "idle", "progress": 0, "task": ""},
-    {"agent": "morpheus", "status": "idle", "progress": 0, "task": ""},
-    {"agent": "trinity", "status": "idle", "progress": 0, "task": ""},
-    {"agent": "tank", "status": "idle", "progress": 0, "task": ""},
+    {"agent": "morpheus", "status": "working", "progress": 67, "task": "analizando el Matrix..."},
+    {"agent": "trinity", "status": "working", "progress": 43, "task": "ejecutando plan de extracción"},
+    {"agent": "tank", "status": "working", "progress": 55, "task": "procesando assets 3D"},
     {"agent": "switch", "status": "idle", "progress": 0, "task": ""},
     {"agent": "smith", "status": "idle", "progress": 0, "task": ""},
     {"agent": "oracle", "status": "idle", "progress": 0, "task": ""},
     {"agent": "keymaker", "status": "idle", "progress": 0, "task": ""},
     {"agent": "sati", "status": "idle", "progress": 0, "task": ""},
+    {"agent": "mouse", "status": "idle", "progress": 0, "task": ""},
     {"agent": "apoc", "status": "idle", "progress": 0, "task": ""},
 ]
 
-if not os.path.exists(STATUS_FILE):
-    with open(STATUS_FILE, 'w') as f:
-        json.dump(initial_status, f)
-
-CORS_HEADERS = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-}
+with open(STATUS_FILE, 'w') as f:
+    json.dump(initial_status, f)
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
+        
         if path == '/' or path == '/index.html':
-            if os.path.exists(HUD_FILE):
-                self._serve_file(HUD_FILE, 'text/html; charset=utf-8')
-            else:
-                self._json(404, {"error": "HUD file not found"})
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            with open(HUD_FILE, 'rb') as f:
+                self.wfile.write(f.read())
+                
         elif path.startswith('/agent-photos/'):
+            # Serve agent photos
             filename = os.path.basename(path)
-            photo_dir = os.path.join(BASE, 'agent-photos')
+            photo_dir = os.path.join(os.path.dirname(__file__), 'agent-photos')
             photo_path = os.path.join(photo_dir, filename)
             if os.path.exists(photo_path):
                 ext = filename.rsplit('.', 1)[-1].lower()
                 ctype = {'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'webp': 'image/webp'}.get(ext, 'image/png')
-                self._serve_file(photo_path, ctype)
+                self.send_response(200)
+                self.send_header('Content-Type', ctype)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Cache-Control', 'max-age=3600')
+                self.end_headers()
+                with open(photo_path, 'rb') as f:
+                    self.wfile.write(f.read())
             else:
-                self._json(404, {"error": "photo not found"})
+                self.send_response(404)
+                self.end_headers()
+                self.wfile.write(b'{"error": "photo not found"}')
+                
         elif path == '/status':
-            self._serve_file(STATUS_FILE, 'application/json')
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            with open(STATUS_FILE, 'r') as f:
+                self.wfile.write(f.read().encode())
+                
         else:
-            self._json(404, {"error": "not found"})
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b'{"error": "not found"}')
     
     def do_POST(self):
         parsed = urlparse(self.path)
-        if parsed.path == '/update':
+        path = parsed.path
+        
+        if path == '/update':
             content_length = int(self.headers.get('Content-Length', 0))
-            body = self.rfile.read(content_length).decode() if content_length else '{}'
+            body = self.rfile.read(content_length).decode()
+            
             try:
                 updates = json.loads(body)
                 if not isinstance(updates, list):
                     updates = [updates]
+                
+                # Read current status
                 with open(STATUS_FILE, 'r') as f:
                     current = json.load(f)
+                
+                # Apply updates
                 for update in updates:
                     agent_id = update.get('agent')
                     existing = [s for s in current if s['agent'] == agent_id]
@@ -76,40 +101,32 @@ class Handler(BaseHTTPRequestHandler):
                         existing[0].update(update)
                     else:
                         current.append(update)
+                
                 with open(STATUS_FILE, 'w') as f:
                     json.dump(current, f, indent=2)
-                self._json(200, {"ok": True, "updates": len(updates)})
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps({"ok": True, "updates": len(updates)}).encode())
+                
             except Exception as e:
-                self._json(400, {"error": str(e)})
+                self.send_response(400)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": str(e)}).encode())
         else:
-            self._json(404, {"error": "not found"})
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b'{"error": "not found"}')
     
     def do_OPTIONS(self):
         self.send_response(200)
-        for k, v in CORS_HEADERS.items():
-            self.send_header(k, v)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
-    
-    def _serve_file(self, path, content_type):
-        self.send_response(200)
-        self.send_header('Content-Type', content_type)
-        for k, v in CORS_HEADERS.items():
-            self.send_header(k, v)
-        if 'image' not in content_type:
-            self.send_header('Cache-Control', 'no-cache')
-        else:
-            self.send_header('Cache-Control', 'max-age=3600')
-        self.end_headers()
-        with open(path, 'rb') as f:
-            self.wfile.write(f.read())
-    
-    def _json(self, code, data):
-        self.send_response(code)
-        self.send_header('Content-Type', 'application/json')
-        for k, v in CORS_HEADERS.items():
-            self.send_header(k, v)
-        self.end_headers()
-        self.wfile.write(json.dumps(data).encode())
     
     def log_message(self, format, *args):
         print(f"[HUD] {args[0]} {args[1]} {args[2]}")
@@ -130,11 +147,16 @@ if __name__ == '__main__':
     print(f"  MATRIX HUD SERVER")
     print(f"{'='*50}")
     print(f"  Local:   http://localhost:{PORT}")
-    if ip != '127.0.0.1':
-        print(f"  Network: http://{ip}:{PORT}")
-    print(f"  To update agent status:")
-    print(f"  curl -X POST http://localhost:{PORT}/update \\")
-    print(f"    -H 'Content-Type: application/json' \\")
-    print(f"    -d '{{\"agent\":\"trinity\",\"status\":\"working\",\"task\":\"codificando...\",\"progress\":42}}'")
+    print(f"  Network: http://{ip}:{PORT}")
+    print('  Update agent status:')
+    print('  curl -X POST http://localhost:%d/update \\' % PORT)
+    print("    -H 'Content-Type: application/json' \\")
+    print("""    -d '{"agent":"trinity","status":"working","task":"codificando..."}'""")
     print(f"{'='*50}\n")
+    
+    # Auto-open browser
+    try:
+        webbrowser.open(f'http://localhost:{PORT}')
+    except: pass
+    
     server.serve_forever()
