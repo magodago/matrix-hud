@@ -124,6 +124,12 @@ body { background: #000; font-family: 'Share Tech Mono', monospace; color: #fff;
   <span class="log-text" id="log-text">Initializing Matrix HUD...</span>
 </div>
 <script>
+// ===== ERROR CATCHER =====
+window.onerror = function(msg, url, line) {
+  document.body.innerHTML = '<div style="color:#d4af37;font-family:monospace;padding:40px;font-size:14px">' +
+    '<h2>⚠️ ERROR</h2><p style="color:white">' + msg + '</p><p style="color:rgba(255,255,255,0.5)">Línea: ' + line + '</p></div>';
+  console.error('ERROR:', msg, 'line:', line);
+};
 // ===== MATRIX CODE RAIN =====
 const rainCanvas = document.getElementById('matrix-rain');
 const rctx = rainCanvas.getContext('2d');
@@ -278,12 +284,16 @@ function createCards() {
   });
 }
 createCards();
-// Activar 3 agentes de demo al cargar
-setTimeout(() => {
-  updateAgent('morpheus','working','analizando el Matrix...','',67);
-  updateAgent('trinity','working','ejecutando plan...','',43);
-  updateAgent('tank','working','procesando assets 3D','',55);
-}, 500);
+try {
+  // Activar 3 agentes de demo al cargar
+  setTimeout(() => {
+    try {
+      updateAgent('morpheus','working','analizando el Matrix...','',67);
+      updateAgent('trinity','working','ejecutando plan...','',43);
+      updateAgent('tank','working','procesando assets 3D','',55);
+    } catch(e){console.error('Error activando agentes:',e)}
+  }, 500);
+} catch(e) { console.error('Error creando cards:',e); }
 // Terminal, quotes, etc
 function startTerminal(agentId) {
   const term=document.getElementById('term-'+agentId); if(!term) return;
