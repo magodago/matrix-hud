@@ -72,6 +72,23 @@ class Handler(BaseHTTPRequestHandler):
             with open(STATUS_FILE, 'r') as f:
                 self.wfile.write(f.read().encode())
                 
+        elif path in ('/favicon.ico', '/apple-touch-icon.png', '/icon-512.png'):
+            # Servir iconos desde la raíz del proyecto
+            filename = path.lstrip('/')
+            icon_path = os.path.join(BASE, filename)
+            if os.path.exists(icon_path):
+                ext = filename.rsplit('.', 1)[-1].lower()
+                ctype = {'png': 'image/png', 'ico': 'image/x-icon'}.get(ext, 'application/octet-stream')
+                self.send_response(200)
+                self.send_header('Content-Type', ctype)
+                self.send_header('Cache-Control', 'max-age=86400')
+                self.end_headers()
+                with open(icon_path, 'rb') as f:
+                    self.wfile.write(f.read())
+            else:
+                self.send_response(404)
+                self.end_headers()
+                
         else:
             self.send_response(404)
             self.end_headers()
