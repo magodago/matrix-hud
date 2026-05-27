@@ -588,27 +588,28 @@ function getBreakXY(idx) {
 }
 
 function getDeskXY(idx) {
-  // 2 filas de 5 cubiculos
-  // Fila 0: agentes 0-4 (y=28%), Fila 1: agentes 5-9 (y=52%)
-  // x espaciado uniforme: 10,25,40,55,70%
+  // Posiciones basadas en el pixel-art 640x480
+  // Sillas están a: x=75+125*col, y=172 (fila 0) o y=332 (fila 1)
+  // Como %: fila 0: y=36%, fila 1: y=69%
+  // x: 12%, 31%, 51%, 70%, 90%
   const row = idx < 5 ? 0 : 1;
   const col = idx % 5;
-  const x = [10, 25, 40, 55, 70][col];
-  const y = row === 0 ? 28 : 52;
+  const x = [12, 31, 51, 70, 90][col];
+  const y = row === 0 ? 36 : 69;
   return { x, y };
 }
 
 function getBreakXY(idx) {
-  // Cafeteria (izquierda): agentes 0-4
-  // Gaming Zone (derecha): agentes 5-9
+  // Cafeteria (izquierda, abajo): x=20-280, y=380-470 → 3-44%, 79-98%
+  // Gaming Zone (derecha, abajo): x=360-620, y=380-470 → 56-97%, 79-98%
   if (idx < 5) {
-    // Cafeteria - esquina inferior izquierda
+    // Cafeteria - 5 agentes en x: 7,14,21,28,35%  y: 85,90%
     const col = idx;
-    return { x: 3 + col * 15, y: 78 + (col % 2) * 8 };
+    return { x: 7 + col * 7, y: 83 + (col % 2) * 6 };
   } else {
-    // Gaming Zone - esquina inferior derecha
+    // Gaming Zone - 5 agentes en x: 62,69,76,83,90%  y: 85,90%
     const col = idx - 5;
-    return { x: 50 + col * 12, y: 78 + (col % 2) * 8 };
+    return { x: 62 + col * 7, y: 83 + (col % 2) * 6 };
   }
 }
 
