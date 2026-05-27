@@ -13,12 +13,12 @@ HUD_FILE = os.path.join(BASE, 'matrix_hud.html')
 STATUS_FILE = os.path.join(BASE, 'agent_status.json')
 PORT = int(os.environ.get('PORT', 3333))
 
-# Initial status
+# Initial status — todos IDLE (los datos reales llegan del monitor)
 initial_status = [
     {"agent": "neo", "status": "idle", "progress": 0, "task": ""},
-    {"agent": "morpheus", "status": "working", "progress": 67, "task": "analizando el Matrix..."},
-    {"agent": "trinity", "status": "working", "progress": 43, "task": "ejecutando plan de extracción"},
-    {"agent": "tank", "status": "working", "progress": 55, "task": "procesando assets 3D"},
+    {"agent": "morpheus", "status": "idle", "progress": 0, "task": ""},
+    {"agent": "trinity", "status": "idle", "progress": 0, "task": ""},
+    {"agent": "tank", "status": "idle", "progress": 0, "task": ""},
     {"agent": "switch", "status": "idle", "progress": 0, "task": ""},
     {"agent": "smith", "status": "idle", "progress": 0, "task": ""},
     {"agent": "oracle", "status": "idle", "progress": 0, "task": ""},
