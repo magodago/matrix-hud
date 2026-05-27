@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STAR WARS — La Saga Completa</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --sw-yellow: #ffe81f;
+  --sw-gold: #ffd700;
+  --sw-blue: #4bd5ee;
+  --sw-red: #ff2600;
+  --sw-dark: #0a0a0a;
+  --sw-card: #111;
+}
+body {
+  background: #000;
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+#stars-bg {
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  z-index: 0;
+}
+/* ===== SLIDE CONTAINER ===== */
+#presentation {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  top:0; left:0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  pointer-events: none;
+}
+.slide.active {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+/* ===== COVER ===== */
+#slide-cover {
+  background: radial-gradient(ellipse at center, #000811 0%, #000 70%);
+}
+#slide-cover::before {
+  content: '';
+  position: absolute;
+  top:0; left:0; width:100%; height:100%;
+  background: radial-gradient(ellipse at 50% 40%, rgba(255,232,31,0.03) 0%, transparent 60%);
+}
+.cover-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(36px, 8vw, 80px);
+  font-weight: 900;
+  color: var(--sw-yellow);
+  text-shadow: 0 0 40px rgba(255,232,31,0.2), 0 0 80px rgba(255,232,31,0.1);
+  letter-spacing: 8px;
+  text-align: center;
+  margin-bottom: 10px;
+  animation: fadeInUp 1s ease;
+}
+.cover-sub {
+  font-size: clamp(14px, 2.5vw, 28px);
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 12px;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+  animation: fadeInUp 1s ease 0.3s both;
+}
+.cover-line {
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--sw-yellow), transparent);
+  margin-bottom: 20px;
+  animation: fadeInUp 1s ease 0.5s both;
+}
+.cover-tagline {
+  font-size: clamp(13px, 1.8vw, 20px);
+  color: rgba(255,255,255,0.4);
+  font-style: italic;
+  letter-spacing: 2px;
+  animation: fadeInUp 1s ease 0.7s both;
+}
+.cover-date {
+  position: absolute;
+  bottom: 40px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 4px;
+  animation: fadeInUp 1s ease 1s both;
+}
+/* ===== SLIDES GENERIC ===== */
+.slide-content {
+  width: 100%;
+  max-width: 960px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.slide-header {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(20px, 3.5vw, 40px);
+  font-weight: 900;
+  color: var(--sw-yellow);
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px rgba(255,232,31,0.1);
+}
+.slide-subhead {
+  font-size: clamp(12px, 1.5vw, 16px);
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 25px;
+  border-bottom: 1px solid rgba(255,232,31,0.1);
+  padding-bottom: 12px;
+}
+.slide-body {
+  font-size: clamp(14px, 1.6vw, 18px);
+  line-height: 1.6;
+  color: rgba(255,255,255,0.8);
+}
+/* ===== GRID LAYOUTS ===== */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 10px;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-top: 10px;
+}
+@media (max-width:700px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .slide { padding: 80px 16px 60px; }
+}
+/* ===== CARDS ===== */
+.card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.3s;
+}
+.card:hover {
+  border-color: rgba(255,232,31,0.15);
+  background: rgba(255,255,255,0.05);
+}
+.card h3 {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(11px, 1.1vw, 14px);
+  color: var(--sw-yellow);
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+.card p, .card li {
+  font-size: clamp(12px, 1.2vw, 15px);
+  color: rgba(255,255,255,0.65);
+  line-height: 1.5;
+}
+.card li { list-style: none; padding: 2px 0; }
+.card li::before { content: '✦ '; color: var(--sw-yellow); opacity: 0.5; }
+.card .big {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(28px, 3vw, 42px);
+  color: var(--sw-yellow);
+  text-shadow: 0 0 20px rgba(255,232,31,0.15);
+}
+.card .label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+/* ===== TRILOGY BADGE ===== */
+.trilogy-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.badge-original { background: rgba(75,213,238,0.12); color: var(--sw-blue); border: 1px solid rgba(75,213,238,0.2); }
+.badge-prequel { background: rgba(255,38,0,0.12); color: var(--sw-red); border: 1px solid rgba(255,38,0,0.2); }
+.badge-sequel { background: rgba(255,232,31,0.12); color: var(--sw-yellow); border: 1px solid rgba(255,232,31,0.2); }
+/* ===== TIMELINE ===== */
+.timeline {
+  position: relative;
+  padding-left: 24px;
+  border-left: 2px solid rgba(255,232,31,0.15);
+}
+.timeline-item {
+  position: relative;
+  padding: 6px 0 12px 12px;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -29px;
+  top: 10px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--sw-yellow);
+  box-shadow: 0 0 10px rgba(255,232,31,0.3);
+}
+.timeline-item .year {
+  font-family: 'Orbitron', monospace;
+  font-size: 13px;
+  color: var(--sw-yellow);
+  letter-spacing: 1px;
+}
+.timeline-item .desc {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+}
+/* ===== CURIOSITIES ===== */
+.curio-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width:700px) {
+  .curio-grid { grid-template-columns: 1fr; }
+}
+.curio-item {
+  background: rgba(255,232,31,0.03);
+  border: 1px solid rgba(255,232,31,0.08);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: clamp(12px, 1.3vw, 15px);
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+}
+.curio-item strong {
+  color: var(--sw-yellow);
+}
+/* ===== ACTOR CARDS ===== */
+.actor-card {
+  text-align: center;
+  padding: 14px 10px;
+}
+.actor-card .avatar {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sw-yellow), #8b7500);
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 24px;
+  font-weight: 900;
+  color: #000;
+}
+.actor-card h4 {
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  color: var(--sw-yellow);
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+.actor-card p {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+}
+/* ===== NAVIGATION ===== */
+#nav {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,232,31,0.08);
+  border-radius: 30px;
+  padding: 8px 16px;
+}
+#nav button {
+  background: none;
+  border: 1px solid rgba(255,232,31,0.15);
+  color: rgba(255,232,31,0.6);
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#nav button:hover { border-color: var(--sw-yellow); color: var(--sw-yellow); }
+#nav .counter {
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  color: rgba(255,232,31,0.4);
+  letter-spacing: 2px;
+  min-width: 50px;
+  text-align: center;
+}
+#nav .dots {
+  display: flex;
+  gap: 5px;
+}
+#nav .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,232,31,0.1);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+#nav .dot.active { background: var(--sw-yellow); box-shadow: 0 0 8px rgba(255,232,31,0.4); width: 20px; border-radius: 3px; }
+/* ===== PROGRESS ===== */
+#progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--sw-yellow), #8b7500);
+  z-index: 200;
+  transition: width 0.5s ease;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* ===== RESPONSIVE ===== */
+@media (max-width:600px) {
+  .slide { padding: 70px 12px 50px; }
+  #nav { padding: 5px 10px; gap: 8px; }
+  #nav button { width: 28px; height: 28px; font-size: 12px; }
+  #nav .counter { font-size: 10px; min-width: 30px; }
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<canvas id="stars-bg"></canvas>
+<div id="presentation">
+
+  <!-- SLIDE 0: COVER -->
+  <div class="slide active" id="slide-cover">
+    <div class="cover-title">STAR WARS</div>
+    <div class="cover-sub">La Saga Completa</div>
+    <div class="cover-line"></div>
+    <div class="cover-tagline">"Hace mucho tiempo, en una galaxia muy, muy lejana..."</div>
+    <div class="cover-date">Una presentación de NEO Agentic AI · 2026</div>
+  </div>
+
+  <!-- SLIDE 1: INTRO -->
+  <div class="slide" id="slide-1">
+    <div class="slide-content">
+      <div class="slide-header">¿Qué es Star Wars?</div>
+      <div class="slide-subhead">La franquicia que cambió el cine para siempre</div>
+      <div class="slide-body">
+        <p style="margin-bottom:16px">Creada por <strong style="color:var(--sw-yellow)">George Lucas</strong> en 1977, Star Wars es una saga de ópera espacial que ha cautivado a generaciones enteras. Ambientada <em>"en una galaxia muy, muy lejana"</em>, la historia sigue el conflicto eterno entre el bien y el mal, encarnado en la lucha entre los <strong style="color:var(--sw-blue)">Jedi</strong> y los <strong style="color:var(--sw-red)">Sith</strong>.</p>
+        <p style="margin-bottom:16px">Lo que comenzó como una película experimental se convirtió en un fenómeno cultural global que abarca 11 películas principales, series animadas y live-action, videojuegos, cómics, novelas y un universo expandido sin precedentes.</p>
+      </div>
+      <div class="grid-3" style="margin-top:20px">
+        <div class="card" style="text-align:center">
+          <div class="big">$10.3B</div>
+          <div class="label">Recaudación Global</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div class="big">11</div>
+          <div class="label">Películas Principales</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div class="big">47</div>
+          <div class="label">Años de Historia</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: GEORGE LUCAS -->
+  <div class="slide" id="slide-2">
+    <div class="slide-content">
+      <div class="slide-header">George Lucas</div>
+      <div class="slide-subhead">El visionario detrás de la galaxia</div>
+      <div class="grid-2">
+        <div class="card" style="grid-column:1">
+          <h3>El Origen</h3>
+          <p>George Lucas nació en 1944 en Modesto, California. Tras el éxito de <em>American Graffiti</em> (1973), decidió llevar a la pantalla su visión de una space opera inspirada en los seriales de Flash Gordon, la mitología de Joseph Campbell, el western <em>The Searchers</em> y la película <em>La Fortaleza Escondida</em> de Akira Kurosawa.</p>
+          <p style="margin-top:10px">Fundó <strong style="color:var(--sw-yellow)">Lucasfilm</strong> en 1971 y posteriormente <strong style="color:var(--sw-yellow)">Industrial Light & Magic (ILM)</strong> para crear los efectos visuales que su visión requería — efectos que revolucionarían la industria del cine.</p>
+          <p style="margin-top:10px">En 2012, vendió Lucasfilm a Disney por <strong style="color:var(--sw-yellow)">$4.050 millones</strong>, asegurando el futuro de la franquicia.</p>
+        </div>
+        <div class="card" style="grid-column:2; display:flex; flex-direction:column; justify-content:center">
+          <h3>Su Filosofía</h3>
+          <p style="font-style:italic; font-size:clamp(13px,1.4vw,16px); color:rgba(255,255,255,0.7); margin-bottom:12px;">"Una película debe ser como un sueño. Debe tener una lógica interna que funcione a nivel emocional, no necesariamente racional."</p>
+          <p style="font-size:13px; color:rgba(255,255,255,0.4);">— George Lucas</p>
+          <div style="margin-top:16px; padding-top:12px; border-top:1px solid rgba(255,232,31,0.08)">
+            <p style="font-size:13px; color:rgba(255,255,255,0.6)">Su concepto del <strong style="color:var(--sw-yellow)">"Monomito"</strong> (El viaje del héroe) de Joseph Campbell fue la columna vertebral narrativa de toda la saga Skywalker.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: TRILOGY ORIGINAL -->
+  <div class="slide" id="slide-3">
+    <div class="slide-content">
+      <div class="slide-header">Trilogía Original</div>
+      <div class="slide-subhead">Episodios IV · V · VI (1977–1983)</div>
+      <div class="grid-3">
+        <div class="card">
+          <span class="trilogy-badge badge-original">★ Episodio IV</span>
+          <h3>Una Nueva Esperanza</h3>
+          <p style="font-size:12px; color:rgba(255,255,255,0.35); margin-bottom:6px">1977 · Dir. George Lucas</p>
+          <p>Luke Skywalker se une al jedi Obi-Wan Kenobi para rescatar a la princesa Leia del Imperio Galáctico y destruir la Estrella de la Muerte. El inicio de la leyenda.</p>
+        </div>
+        <div class="card">
+          <span class="trilogy-badge badge-original">★ Episodio V</span>
+          <h3>El Imperio Contraataca</h3>
+          <p style="font-size:12px; color:rgba(255,255,255,0.35); margin-bottom:6px">1980 · Dir. Irvin Kershner</p>
+          <p>Considerada la mejor de la saga. El Imperio contraataca liderado por Darth Vader. Luke entrena con Yoda y descubre la verdad: <em>"Yo soy tu padre"</em>.</p>
+        </div>
+        <div class="card">
+          <span class="trilogy-badge badge-original">★ Episodio VI</span>
+          <h3>El Retorno del Jedi</h3>
+          <p style="font-size:12px; color:rgba(255,255,255,0.35); margin-bottom:6px">1983 · Dir. Richard Marquand</p>
+          <p>La Alianza Rebelde lanza un ataque final contra el Imperio. Luke se enfrenta a su padre, Vader se redime y la galaxia celebra la caída del Emperador.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: TRILOGY PREQUEL -->
+  <div class="slide" id="slide-4">
+    <div class="slide-content">
+      <div class="slide-header">Trilogía de Precuelas</div>
+      <div class="slide-subhead">Episodios I · II · III (1999–2005)</div>
+      <div class="grid-3">
+        <div class="card">
+          <span class="trilogy-badge badge-prequel">★ Episodio I</span>
+          <h3>La Amenaza Fantasma</h3>
+          <p style="font-size:12px; color:rgba(255,255,255,0.35); margin-bottom:6px">1999 · Dir. George Lucas</p>
+          <p>El joven Anakin Skywalker es descubierto en Tatooine por Qui-Gon Jinn. El resurgir de los Sith y el misterioso Darth Maul marcan el inicio de la caída.</p>
+        </div>
+        <div class="card">
+          <span class="trilogy-badge badge-prequel">★ Episodio II</span>
+          <h3>El Ataque de los Clones</h3>
+          <p style="font-size:12px; color:rgba(255,255,255,0.35); margin-bottom:6px">2002 · Dir. George Lucas</p>
+          <p>Anakin protege a Padmé Amidala mientras descubre su amor prohibido. Estalla la Guerra de los Clones y el Canciller Palpatine consolida su poder.</p>
+        </div>
+        <div class="card">
+          <span class="trilogy-badge badge-prequel">★ Episodio III</span>
+          <h3>La Venganza de los Sith</h3>
+          <p style="font-size:12px; color:rgba(255,255,255,0.35); margin-bottom:6px">2005 · Dir. George Lucas</p>
+          <p>Anakin cae al Lado Oscuro y se convierte en Darth Vader. La Orden 66 aniquila a los Jedi. El Imperio nace de las cenizas de la República.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: TRILOGY SEQUEL -->
+  <div class="slide" id="slide-5">
+    <div class="slide-content">
+      <div class="slide-header">Trilogía Secuela</div>
+      <div class="slide-subhead">Episodios VII · VIII · IX (2015–2019)</div>
+      <div class="grid-3">
+        <div class="card">
+          <span class="trilogy-badge badge-sequel">★ Episodio VII</span>
+          <h3>El Despertar de la Fuerza</h3>
+          <p style="font-size:12px; color:rgba(255,255,255,0.35); margin-bottom:6px">2015 · Dir. J.J. Abrams</p>
+          <p>Treinta años después. La Resistencia lucha contra la Primera Orden. Rey, una chatarrera de Jakku, descubre su conexión con la Fuerza y se enfrenta a Kylo Ren.</p>
+        </div>
+        <div class="card">
+          <span class="trilogy-badge badge-sequel">★ Episodio VIII</span>
+          <h3>Los Últimos Jedi</h3>
+          <p style="font-size:12px; color:rgba(255,255,255,0.35); margin-bottom:6px">2017 · Dir. Rian Johnson</p>
+          <p>Rey entrena con un Luke Skywalker exiliado. La Resistencia sobrevive al borde de la extinción. La película más divisiva de la saga.</p>
+        </div>
+        <div class="card">
+          <span class="trilogy-badge badge-sequel">★ Episodio IX</span>
+          <h3>El Ascenso de Skywalker</h3>
+          <p style="font-size:12px; color:rgba(255,255,255,0.35); margin-bottom:6px">2019 · Dir. J.J. Abrams</p>
+          <p>El Emperador Palpatine resucita. Rey descubre su linaje Sith. La Resistencia finalmente derrota a la Orden Final. El fin de la saga Skywalker.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: TIMELINE -->
+  <div class="slide" id="slide-6">
+    <div class="slide-content">
+      <div class="slide-header">Línea de Tiempo</div>
+      <div class="slide-subhead">Cronología de la Saga Skywalker</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
+        <div class="timeline">
+          <div class="timeline-item"><div class="year">1977</div><div class="desc">Episodio IV — Una Nueva Esperanza</div></div>
+          <div class="timeline-item"><div class="year">1980</div><div class="desc">Episodio V — El Imperio Contraataca</div></div>
+          <div class="timeline-item"><div class="year">1983</div><div class="desc">Episodio VI — El Retorno del Jedi</div></div>
+          <div class="timeline-item"><div class="year">1999</div><div class="desc">Episodio I — La Amenaza Fantasma</div></div>
+          <div class="timeline-item"><div class="year">2002</div><div class="desc">Episodio II — El Ataque de los Clones</div></div>
+          <div class="timeline-item"><div class="year">2005</div><div class="desc">Episodio III — La Venganza de los Sith</div></div>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item"><div class="year">2008</div><div class="desc">Star Wars: The Clone Wars (serie)</div></div>
+          <div class="timeline-item"><div class="year">2015</div><div class="desc">Episodio VII — El Despertar de la Fuerza</div></div>
+          <div class="timeline-item"><div class="year">2016</div><div class="desc">Rogue One: Una Historia de Star Wars</div></div>
+          <div class="timeline-item"><div class="year">2017</div><div class="desc">Episodio VIII — Los Últimos Jedi</div></div>
+          <div class="timeline-item"><div class="year">2018</div><div class="desc">Solo: Una Historia de Star Wars</div></div>
+          <div class="timeline-item"><div class="year">2019</div><div class="desc">Episodio IX — El Ascenso de Skywalker</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: MAIN CHARACTERS -->
+  <div class="slide" id="slide-7">
+    <div class="slide-content">
+      <div class="slide-header">Personajes Principales</div>
+      <div class="slide-subhead">Los rostros de la galaxia</div>
+      <div class="grid-3">
+        <div class="card actor-card">
+          <div class="avatar" style="background:linear-gradient(135deg,#4bd5ee,#1a6b7a)">LS</div>
+          <h4>Luke Skywalker</h4>
+          <p>Mark Hamill · El último Jedi</p>
+        </div>
+        <div class="card actor-card">
+          <div class="avatar" style="background:linear-gradient(135deg,#ffe81f,#8b7500)">HS</div>
+          <h4>Han Solo</h4>
+          <p>Harrison Ford · Contrabandista</p>
+        </div>
+        <div class="card actor-card">
+          <div class="avatar" style="background:linear-gradient(135deg,#ff6b6b,#8b0000)">PL</div>
+          <h4>Princesa Leia</h4>
+          <p>Carrie Fisher · Líder Rebelde</p>
+        </div>
+        <div class="card actor-card">
+          <div class="avatar" style="background:linear-gradient(135deg,#000,#333)">DV</div>
+          <h4>Darth Vader</h4>
+          <p>David Prowse / James Earl Jones</p>
+        </div>
+        <div class="card actor-card">
+          <div class="avatar" style="background:linear-gradient(135deg,#2d2d2d,#555)">YO</div>
+          <h4>Yoda</h4>
+          <p>Frank Oz · Maestro Jedi</p>
+        </div>
+        <div class="card actor-card">
+          <div class="avatar" style="background:linear-gradient(135deg,#ff2600,#8b0000)">AS</div>
+          <h4>Anakin Skywalker</h4>
+          <p>Hayden Christensen · El Elegido</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: CURIOSITIES -->
+  <div class="slide" id="slide-8">
+    <div class="slide-content">
+      <div class="slide-header">Curiosidades</div>
+      <div class="slide-subhead">Datos que quizás no conocías</div>
+      <div class="curio-grid">
+        <div class="curio-item"><strong>🔊 "I am your father"</strong> — Solo 3 personas en el set conocían la verdad. Hamill grabó la escena sin saberlo. Vader lo dice realmente: "Obi-Wan never told you what happened to your father."</div>
+        <div class="curio-item"><strong>📼 El primer VHS más caro</strong> — Una copia original de 1977 de Star Wars en VHS se vendió por $13,000 en una subasta de 2023.</div>
+        <div class="curio-item"><strong>👽 Chewbacca inspirado en un perro</strong> — George Lucas tuvo la idea de Chewbacca tras ver a su perro, Indiana, sentado en el asiento del copiloto de su coche.</div>
+        <div class="curio-item"><strong>🎭 Darth Vader sin capa</strong> — En la primera película, la capa de Vader era tan larga que David Prowse (el actor dentro del traje) se caía constantemente por las escaleras.</div>
+        <div class="curio-item"><strong>💰 Lucas rechazó $500M</strong> — George Lucas rechazó una oferta de $500 millones de Fox por los derechos de merchandising de Star Wars. Fox pensó que estaba loco; Lucas ganó miles de millones.</div>
+        <div class="curio-item"><strong>🌍 "May the 4th be with you"</strong> — El Día de Star Wars (4 de mayo) nació de un juego de palabras de los fans en 1979 tras la elección de Margaret Thatcher.</div>
+        <div class="curio-item"><strong>🎬 Yoda iba a ser un mono</strong> — Originalmente Yoda iba a ser interpretado por un mono con máscara y bastón. Por suerte, Frank Oz y los titiriteros de los Muppets lo hicieron con marioneta.</div>
+        <div class="curio-item"><strong>📖 La Biblia de Star Wars</strong> — Lucas contrató al antropólogo Joseph Campbell como consultor. Campbell llamó a Star Wars "la mitología moderna" por seguir el arquetipo del viaje del héroe.</div>
+        <div class="curio-item"><strong>🏆 Oscar honorífico</strong> — La primera película de Star Wars ganó 7 Oscars de 10 nominaciones, incluyendo Mejor Banda Sonora para John Williams. En 1978, recibió un Oscar especial por sus efectos de sonido.</div>
+        <div class="curio-item"><strong>🛸 El Halcón Milenario "sin terminar"</strong> — El set del Halcón Milenario se construyó apresuradamente y muchas paredes eran simplemente paneles sin decorar que nunca se ven en cámara.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: CULTURAL IMPACT -->
+  <div class="slide" id="slide-9">
+    <div class="slide-content">
+      <div class="slide-header">Impacto Cultural</div>
+      <div class="slide-subhead">El fenómeno que redefinió el entretenimiento</div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>🎬 Revolución Cinematográfica</h3>
+          <p>Star Wars cambió para siempre la industria del cine: popularizó los <strong style="color:var(--sw-yellow)">blockbusters</strong> de verano, revolucionó los efectos visuales con ILM, estableció el modelo moderno de <strong style="color:var(--sw-yellow)">merchandising</strong> masivo y demostró que las franquicias podían generar ingresos multimillonarios durante décadas.</p>
+          <p style="margin-top:8px">John Williams compuso lo que la Academia llamó "la banda sonora más influyente de la historia del cine". Su tema principal es reconocible en cualquier rincón del mundo.</p>
+        </div>
+        <div class="card">
+          <h3>📊 Datos Clave</h3>
+          <ul>
+            <li><strong>$10.3 mil millones</strong> recaudados en taquilla global</li>
+            <li><strong>+$42 mil millones</strong> en ventas de merchandising</li>
+            <li><strong>+50 millones</strong> de figuras de acción vendidas solo en los 80</li>
+            <li><strong>+400</strong> novelas del Universo Expandido publicadas</li>
+            <li><strong>+75 millones</strong> de espectadores vieron Episodio VII en su estreno</li>
+            <li><strong>#1</strong> franquicia de juguetes más vendida de la historia</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: CLOSING -->
+  <div class="slide" id="slide-10">
+    <div class="slide-content" style="align-items:center; text-align:center">
+      <div style="font-family:'Orbitron',monospace; font-size:clamp(24px,4vw,48px); color:var(--sw-yellow); letter-spacing:6px; text-shadow:0 0 30px rgba(255,232,31,0.15); margin-bottom:20px">
+        ★ MAY THE FORCE BE WITH YOU ★
+      </div>
+      <div style="width:100px; height:2px; background:linear-gradient(90deg,transparent,var(--sw-yellow),transparent); margin:0 auto 20px"></div>
+      <p style="font-size:clamp(14px,1.6vw,18px); color:rgba(255,255,255,0.6); font-style:italic; max-width:600px">
+        "La Fuerza te acompañará... siempre."
+      </p>
+      <p style="font-size:13px; color:rgba(255,255,255,0.25); margin-top:30px; letter-spacing:3px">
+        NEO Agentic AI · David Ortiz · 2026
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== NAVIGATION ===== -->
+<div id="nav">
+  <button id="prev-btn">◀</button>
+  <div class="counter" id="slide-counter">01 / 11</div>
+  <div class="dots" id="slide-dots"></div>
+  <button id="next-btn">▶</button>
+</div>
+
+<script>
+// ===== STARS BACKGROUND =====
+const canvas = document.getElementById('stars-bg');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const stars = Array(300).fill().map(() => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  r: Math.random() * 1.5 + 0.3,
+  a: Math.random(),
+  s: Math.random() * 0.02 + 0.005
+}));
+function drawStars() {
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    s.a += s.s;
+    const alpha = 0.3 + 0.7 * (Math.sin(s.a) * 0.5 + 0.5);
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+// ===== SLIDES =====
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let current = 0;
+
+// Dots
+const dotsContainer = document.getElementById('slide-dots');
+for (let i = 0; i < total; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  dot.addEventListener('click', () => goTo(i));
+  dotsContainer.appendChild(dot);
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= total) return;
+  slides[current].classList.remove('active');
+  slides[idx].classList.add('active');
+  current = idx;
+  updateUI();
+}
+
+function updateUI() {
+  const num = String(current + 1).padStart(2, '0');
+  document.getElementById('slide-counter').textContent = `${num} / ${String(total).padStart(2, '0')}`;
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+  document.getElementById('progress').style.width = `${((current + 1) / total) * 100}%`;
+}
+
+document.getElementById('next-btn').addEventListener('click', () => goTo(Math.min(current + 1, total - 1)));
+document.getElementById('prev-btn').addEventListener('click', () => goTo(Math.max(current - 1, 0)));
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); goTo(Math.min(current + 1, total - 1)); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(Math.max(current - 1, 0)); }
+});
+
+// Touch swipe
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+document.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 50) {
+    diff > 0 ? goTo(Math.min(current + 1, total - 1)) : goTo(Math.max(current - 1, 0));
+  }
+});
+
+updateUI();
+</script>
+</body>
+</html>
