@@ -3,16 +3,35 @@
   "portfolio_value": 97.34,
   "positions": [
     {
-      "ts": "2026-05-27T19:40:21.601462+00:00",
-      "market": "Will Portugal win the 2026 FIFA World Cup?",
-      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
+      "ts": "2026-05-27T19:45:38.727371+00:00",
+      "market": "Will the San Antonio Spurs win the 2026 NBA Finals?",
+      "slug": "will-the-san-antonio-spurs-win-the-2026-nba-finals",
       "type": "BUY_YES",
-      "entry": 10.5,
-      "shares": 323.24,
+      "entry": 14.9,
+      "shares": 227.79,
       "size": 33.94,
       "gross": 35.0,
       "fees": {
         "total": 1.06,
+        "gas": 0.5
+      },
+      "score": 97.0,
+      "conf": "high",
+      "status": "open",
+      "pnl": 0,
+      "cp": 14.9
+    },
+    {
+      "ts": "2026-05-27T19:45:38.727411+00:00",
+      "market": "Will Portugal win the 2026 FIFA World Cup?",
+      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
+      "type": "BUY_YES",
+      "entry": 10.5,
+      "shares": 208.44,
+      "size": 21.89,
+      "gross": 22.75,
+      "fees": {
+        "total": 0.864,
         "gas": 0.5
       },
       "score": 96.7,
@@ -22,16 +41,16 @@
       "cp": 10.5
     },
     {
-      "ts": "2026-05-27T19:40:21.601498+00:00",
+      "ts": "2026-05-27T19:45:38.727420+00:00",
       "market": "Will Netherlands win the 2026 FIFA World Cup?",
       "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
       "type": "BUY_YES",
       "entry": 3.9,
-      "shares": 561.18,
-      "size": 21.89,
-      "gross": 22.75,
+      "shares": 360.28,
+      "size": 14.05,
+      "gross": 14.79,
       "fees": {
-        "total": 0.864,
+        "total": 0.7366,
         "gas": 0.5
       },
       "score": 96.6,
@@ -39,39 +58,39 @@
       "status": "open",
       "pnl": 0,
       "cp": 3.9
-    },
-    {
-      "ts": "2026-05-27T19:40:21.601508+00:00",
-      "market": "Will Brazil win the 2026 FIFA World Cup?",
-      "slug": "will-brazil-win-the-2026-fifa-world-cup-183",
-      "type": "BUY_YES",
-      "entry": 9.3,
-      "shares": 151.08,
-      "size": 14.05,
-      "gross": 14.79,
-      "fees": {
-        "total": 0.7366,
-        "gas": 0.5
-      },
-      "score": 96.5,
-      "conf": "high",
-      "status": "open",
-      "pnl": 0,
-      "cp": 9.3
     }
   ],
   "trade_history": [
     {
-      "ts": "2026-05-27T19:40:21.601462+00:00",
-      "market": "Will Portugal win the 2026 FIFA World Cup?",
-      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
+      "ts": "2026-05-27T19:45:38.727371+00:00",
+      "market": "Will the San Antonio Spurs win the 2026 NBA Finals?",
+      "slug": "will-the-san-antonio-spurs-win-the-2026-nba-finals",
       "type": "BUY_YES",
-      "entry": 10.5,
-      "shares": 323.24,
+      "entry": 14.9,
+      "shares": 227.79,
       "size": 33.94,
       "gross": 35.0,
       "fees": {
         "total": 1.06,
+        "gas": 0.5
+      },
+      "score": 97.0,
+      "conf": "high",
+      "status": "open",
+      "pnl": 0,
+      "cp": 14.9
+    },
+    {
+      "ts": "2026-05-27T19:45:38.727411+00:00",
+      "market": "Will Portugal win the 2026 FIFA World Cup?",
+      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
+      "type": "BUY_YES",
+      "entry": 10.5,
+      "shares": 208.44,
+      "size": 21.89,
+      "gross": 22.75,
+      "fees": {
+        "total": 0.864,
         "gas": 0.5
       },
       "score": 96.7,
@@ -81,16 +100,16 @@
       "cp": 10.5
     },
     {
-      "ts": "2026-05-27T19:40:21.601498+00:00",
+      "ts": "2026-05-27T19:45:38.727420+00:00",
       "market": "Will Netherlands win the 2026 FIFA World Cup?",
       "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
       "type": "BUY_YES",
       "entry": 3.9,
-      "shares": 561.18,
-      "size": 21.89,
-      "gross": 22.75,
+      "shares": 360.28,
+      "size": 14.05,
+      "gross": 14.79,
       "fees": {
-        "total": 0.864,
+        "total": 0.7366,
         "gas": 0.5
       },
       "score": 96.6,
@@ -98,25 +117,6 @@
       "status": "open",
       "pnl": 0,
       "cp": 3.9
-    },
-    {
-      "ts": "2026-05-27T19:40:21.601508+00:00",
-      "market": "Will Brazil win the 2026 FIFA World Cup?",
-      "slug": "will-brazil-win-the-2026-fifa-world-cup-183",
-      "type": "BUY_YES",
-      "entry": 9.3,
-      "shares": 151.08,
-      "size": 14.05,
-      "gross": 14.79,
-      "fees": {
-        "total": 0.7366,
-        "gas": 0.5
-      },
-      "score": 96.5,
-      "conf": "high",
-      "status": "open",
-      "pnl": 0,
-      "cp": 9.3
     }
   ],
   "total_trades": 3,
@@ -126,9 +126,9 @@
   "total_fees": 2.6606,
   "total_pnl": -2.66,
   "started_at": "2026-05-27T19:37:15.623987+00:00",
-  "cycle": 13,
-  "last_price": 75029.48,
-  "price_change_24h": -0.02,
+  "cycle": 34,
+  "last_price": 75004.49,
+  "price_change_24h": -0.08,
   "signal": "WAIT",
   "rsi": 50,
   "ema_fast": 0,
@@ -138,7 +138,12 @@
   "close_prices": [
     75069.29,
     75050.0,
-    75054.01
+    75054.01,
+    75038.0,
+    75041.6,
+    74986.67,
+    74995.52,
+    75012.27
   ],
   "all_prices": [],
   "cfg": {
@@ -182,16 +187,26 @@
   },
   "last_signal_ts": 0,
   "cooloff_until": 0,
-  "last_updated": "2026-05-27T19:40:21.601529+00:00",
+  "last_updated": "2026-05-27T19:45:38.727443+00:00",
   "total_gas": 1.5,
   "markets_scanned": 885,
   "opportunities": [
+    {
+      "q": "Will the San Antonio Spurs win the 2026 NBA Finals?",
+      "slug": "will-the-san-antonio-spurs-win-the-2026-nba-finals",
+      "yp": 14.9,
+      "sp": 0.1,
+      "vol": 31109107.28701839,
+      "score": 97.0,
+      "rec": "BUY_YES",
+      "conf": "high"
+    },
     {
       "q": "Will Portugal win the 2026 FIFA World Cup?",
       "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
       "yp": 10.5,
       "sp": 0.1,
-      "vol": 24611728.322650645,
+      "vol": 24612831.86560064,
       "score": 96.7,
       "rec": "BUY_YES",
       "conf": "high"
@@ -201,7 +216,7 @@
       "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
       "yp": 3.9,
       "sp": 0.1,
-      "vol": 23729407.21863347,
+      "vol": 23730805.33195847,
       "score": 96.6,
       "rec": "BUY_YES",
       "conf": "high"
@@ -211,7 +226,7 @@
       "slug": "will-brazil-win-the-2026-fifa-world-cup-183",
       "yp": 9.3,
       "sp": 0.1,
-      "vol": 22374484.42852405,
+      "vol": 22377017.111569054,
       "score": 96.5,
       "rec": "BUY_YES",
       "conf": "high"
@@ -221,17 +236,7 @@
       "slug": "will-argentina-win-the-2026-fifa-world-cup-245",
       "yp": 8.3,
       "sp": 0.1,
-      "vol": 21984703.34426296,
-      "score": 96.5,
-      "rec": "BUY_YES",
-      "conf": "high"
-    },
-    {
-      "q": "Will the San Antonio Spurs win the 2026 NBA Finals?",
-      "slug": "will-the-san-antonio-spurs-win-the-2026-nba-finals",
-      "yp": 14.9,
-      "sp": 0.2,
-      "vol": 31108831.28701839,
+      "vol": 21987572.39187696,
       "score": 96.5,
       "rec": "BUY_YES",
       "conf": "high"
