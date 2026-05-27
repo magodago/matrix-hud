@@ -219,8 +219,13 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
 @media (min-width:901px) and (max-width:1100px) { .agents-grid { grid-template-columns:repeat(3,1fr); } }
 
 
+/* ===== MAPA + TERMINAL + CORTINA EN FLEX COLUMN ===== */
+#map-content { display:none; flex-direction:column; flex:1; min-height:calc(100vh - 60px); }
+#map-terminal-area { flex:1; display:flex; flex-direction:column; min-height:0; width:100%; max-width:700px; margin:0 auto; }
+#map-terminal-area .task-terminal { flex-shrink:0; margin:6px 0 0; width:100%; max-width:100%; }
+#map-terminal-area .matrix-curtain { flex:1; min-height:60px; width:100%; max-width:100%; margin:0; border-radius:0 0 4px 4px; }
 /* ===== MAPA DE OFICINA CYBERPUNK V2 ===== */
-#office-map { display:none; position:relative; z-index:2; width:100%; background:url('/office_bg.png') center/contain no-repeat; overflow:hidden; min-height:300px; max-height:calc(100vh - 110px); aspect-ratio:4/3; margin:0 auto; background-color:#0d0d12; image-rendering:pixelated; }
+#office-map { display:none; position:relative; z-index:2; width:100%; background:url('/office_bg.png') center/contain no-repeat; overflow:hidden; min-height:300px; max-height:calc(100vh - 110px); aspect-ratio:4/3; margin:0 auto; background-color:#0d0d12; image-rendering:pixelated; flex-shrink:0; }
 #office-canvas { display:none; }
 /* Sprites de agentes */
 .agent-sprite {
@@ -344,11 +349,15 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
   </div>
 </div>
 <div class="agents-grid" id="agents-grid"></div>
+<!-- ===== MAP CONTENT (MAP + TERMINAL + CURTAIN) ===== -->
+<div id="map-content">
 <!-- ===== OFICINA MAPA CYBERPUNK ===== -->
 <div id="office-map">
   <img src="/office_bg.png" id="office-bg" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;image-rendering:pixelated;z-index:1;">
   <div id="agent-sprites" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;"></div>
 </div>
+<!-- ===== TERMINAL + CORTINA ===== -->
+<div id="map-terminal-area">
 <!-- ===== TERMINAL DE TAREAS ===== -->
 <div class="task-terminal" id="task-terminal">
   <div class="task-term-header">⏣ LOG DE TAREAS</div>
@@ -360,16 +369,21 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
 <div class="matrix-curtain" id="matrix-curtain">
   <canvas id="curtain-canvas"></canvas>
 </div>
+</div>
+</div>
 <script>
 // ===== MATRIX CURTAIN RAIN =====
 const curtainCanvas = document.getElementById('curtain-canvas');
 const cctx = curtainCanvas.getContext('2d');
 let cW = 0, cH = 0, ccols = 0, cdrops = [];
 function initCurtain() {
-  cW = curtainCanvas.width = curtainCanvas.parentElement.offsetWidth;
-  cH = curtainCanvas.height = 120;
-  ccols = Math.floor(cW / 10);
-  cdrops = Array(ccols).fill(1).map(() => Math.random() * 12);
+  const parent = curtainCanvas.parentElement;
+  if (!parent) return;
+  const ph = parent.offsetHeight || 120;
+  cW = curtainCanvas.width = parent.offsetWidth || 400;
+  cH = curtainCanvas.height = Math.max(ph, 60);
+  ccols = Math.max(Math.floor(cW / 10), 1);
+  cdrops = Array(ccols).fill(1).map(() => Math.random() * Math.floor(cH / 10));
 }
 initCurtain();
 function drawCurtain() {
@@ -385,7 +399,78 @@ function drawCurtain() {
   }
 }
 setInterval(drawCurtain, 60);
-window.addEventListener('resize', () => { initCurtain(); });
+// ===== MATRIX HOTSPOTS: frases que aparecen en la lluvia =====
+const matrixPhrases = [
+  'WAKE UP', 'THE ONE', 'FREE YOUR MIND', 'FOLLOW THE WHITE RABBIT',
+  'THERE IS NO SPOON', 'KNOCK KNOCK', 'NEO', 'MATRIX HAS YOU',
+  'SYSTEM LOADING', 'AGENT ONLINE', 'SHELL ACCESS', 'TRACE DETECTED',
+  'ACCESS GRANTED', 'REALITY IS CODE', 'DÉJÀ VU', 'ZION STANDS'
+];
+let hotspotTimers = [];
+
+function spawnHotspot() {
+  const phrase = matrixPhrases[Math.floor(Math.random() * matrixPhrases.length)];
+  const col = Math.floor(Math.random() * ccols);
+  const startRow = Math.floor(Math.random() * (cH / 10 - phrase.length)) + 2;
+  const id = Date.now() + Math.random();
+  hotspotTimers.push({ id, col, startRow, phrase, age: 0, maxAge: 6 + Math.floor(Math.random() * 8) });
+  // Limpiar hotspots viejos
+  hotspotTimers = hotspotTimers.filter(h => h.age < h.maxAge);
+  // Próximo hotspot aleatorio
+  setTimeout(spawnHotspot, 12000 + Math.random() * 25000);
+}
+
+// Dibujar hotspots dentro de drawCurtain
+const origDrawCurtain = drawCurtain;
+drawCurtain = function() {
+  // Fondo original
+  cctx.fillStyle = 'rgba(5,5,5,0.06)';
+  cctx.fillRect(0, 0, cW, cH);
+  cctx.font = '10px monospace';
+  // Lluvia normal
+  for (let i = 0; i < cdrops.length; i++) {
+    const ch = String.fromCharCode(0x30A0 + Math.random() * 96);
+    cctx.fillStyle = Math.random() > 0.98 ? '#ccffcc' : Math.random() > 0.5 ? '#00ff41' : '#006600';
+    cctx.fillText(ch, i * 10, cdrops[i] * 10);
+    cdrops[i]++;
+    if (cdrops[i] * 10 > cH && Math.random() > 0.975) cdrops[i] = 0;
+  }
+  // Hotspots
+  const now = Date.now();
+  const pulse = Math.sin(now / 200) * 0.5 + 0.5;
+  hotspotTimers = hotspotTimers.filter(h => {
+    h.age++;
+    if (h.age >= h.maxAge) return false;
+    const x = h.col * 10;
+    const y = (h.startRow + h.age) * 10;
+    // Glow más intenso al inicio
+    const intensity = Math.max(0, 1 - h.age / h.maxAge);
+    const glowSize = 3 + intensity * 6;
+    // Resplandor dorado
+    cctx.shadowColor = '#ffd700';
+    cctx.shadowBlur = glowSize * 4;
+    cctx.font = `bold ${10 + intensity * 4}px monospace`;
+    cctx.fillStyle = `rgba(255,215,0,${0.6 + 0.4 * pulse})`;
+    cctx.fillText(h.phrase, x - 2, y + 20);
+    cctx.shadowBlur = 0;
+    // Reset font
+    cctx.font = '10px monospace';
+    return true;
+  });
+};
+// Iniciar hotspots
+setTimeout(spawnHotspot, 3000);
+
+// ResizeObserver para re-calcular cortina cuando el flex cambie de tamaño
+if (window.ResizeObserver) {
+  const ro = new ResizeObserver(() => {
+    if (document.getElementById('matrix-curtain').style.display !== 'none') initCurtain();
+  });
+  const termArea = document.getElementById('map-terminal-area');
+  if (termArea) ro.observe(termArea);
+}
+
+window.addEventListener('resize', () => { if (document.getElementById('matrix-curtain').style.display !== 'none') initCurtain(); });
 // ===== HISTORIAL DE TAREAS =====
 const taskHistory = [];
 let taskHistoryIndex = 0;
@@ -833,25 +918,27 @@ updateAgent = (function(orig) {
 function switchView(view) {
   const grid = document.getElementById('agents-grid');
   const map = document.getElementById('office-map');
+  const mapContent = document.getElementById('map-content');
   const term = document.getElementById('task-terminal');
   const curtain = document.getElementById('matrix-curtain');
+  const termArea = document.getElementById('map-terminal-area');
   const btnGrid = document.getElementById('btn-grid');
   const btnMap = document.getElementById('btn-map');
   if (!grid || !map) return;
   if (view === 'grid') {
     grid.style.display = 'grid';
-    map.style.display = 'none';
-    if (term) term.style.display = 'none';
-    if (curtain) curtain.style.display = 'none';
+    if (mapContent) mapContent.style.display = 'none';
     btnGrid.classList.add('active');
     btnMap.classList.remove('active');
   } else {
     grid.style.display = 'none';
+    if (mapContent) { mapContent.style.display = 'flex'; }
     map.style.display = 'block';
-    if (term) term.style.display = 'block';
-    if (curtain) { curtain.style.display = 'block'; setTimeout(initCurtain, 50); }
+    if (curtain) curtain.style.display = 'block';
+    if (termArea) termArea.style.display = 'flex';
     btnGrid.classList.remove('active');
     btnMap.classList.add('active');
+    setTimeout(() => { initCurtain(); }, 100);
     createAgentSprites();
     // Sincronizar sprites con estado actual inmediatamente
     agents.forEach(agent => {
