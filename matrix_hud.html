@@ -180,82 +180,78 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
   #completion-tap { font-size:4vw !important; }
 }
 
-/* ===== MAPA DE OFICINA CYBERPUNK ===== */
-#office-map { display:none; position:relative; z-index:2; width:100%; height:calc(100vh - 110px); background:#050505; overflow:hidden; min-height:400px; }
+/* ===== MAPA DE OFICINA CYBERPUNK V2 ===== */
+#office-map { display:none; position:relative; z-index:2; width:100%; height:calc(100vh - 110px); background:#0d0d12; overflow:hidden; min-height:420px; }
 #office-canvas { position:absolute; top:0; left:0; width:100%; height:100%; }
-/* Agentes HTML overlay sobre el canvas */
+/* Sprites de agentes */
 .agent-sprite {
-  position:absolute; z-index:10;
-  width:clamp(40px,8vw,72px); height:clamp(40px,8vw,72px);
+  position:absolute; z-index:20;
+  width:clamp(36px,7vw,64px); height:clamp(36px,7vw,64px);
   border-radius:50%; overflow:hidden;
-  border:2px solid rgba(212,175,55,0.2);
-  transition:all 1.2s cubic-bezier(0.34,1.56,0.64,1);
+  border:2px solid rgba(212,175,55,0.3);
+  transition:left 2.5s cubic-bezier(0.25,0.46,0.45,0.94), top 2.5s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.3s, filter 0.5s, border-color 0.5s;
   cursor:pointer;
-  box-shadow:0 0 15px rgba(0,0,0,0.5);
+  box-shadow:0 0 20px rgba(0,0,0,0.6);
   pointer-events:auto;
 }
 .agent-sprite img { width:100%; height:100%; object-fit:cover; }
-.agent-sprite.idle { border-color:rgba(80,80,80,0.3); filter:brightness(0.5); transform:scale(0.85); }
+.agent-sprite.idle { 
+  border-color:rgba(100,100,100,0.2); 
+  filter:brightness(0.5) saturate(0.3); 
+  transform:scale(0.8); 
+  transition:left 3s cubic-bezier(0.25,0.46,0.45,0.94), top 3s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.5s, filter 0.5s;
+}
+.agent-sprite.walking {
+  border-color:#00ccff;
+  box-shadow:0 0 20px rgba(0,204,255,0.2);
+  filter:brightness(1.1);
+  animation:sprite-walk 0.25s ease-in-out infinite alternate;
+  z-index:30;
+}
 .agent-sprite.working {
-  border-color:#00ff88; 
+  border-color:#00ff88;
   box-shadow:0 0 25px rgba(0,255,136,0.3), 0 0 60px rgba(0,255,136,0.1);
-  filter:brightness(1.2);
+  filter:brightness(1.3);
   animation:sprite-breathe 2s ease-in-out infinite;
-  transform:scale(1);
 }
 .agent-sprite.done {
   border-color:#ffd700;
   box-shadow:0 0 30px rgba(255,215,0,0.4), 0 0 80px rgba(255,215,0,0.15);
-  filter:brightness(1.3);
-  transform:scale(1.05);
-}
-.agent-sprite.moving {
-  border-color:#00ccff;
-  box-shadow:0 0 20px rgba(0,204,255,0.3);
-  animation:sprite-walk 0.3s ease-in-out infinite alternate;
-  transform:scale(1);
-}
-@keyframes sprite-breathe {
-  0%,100% { box-shadow:0 0 20px rgba(0,255,136,0.2); }
-  50% { box-shadow:0 0 35px rgba(0,255,136,0.4), 0 0 70px rgba(0,255,136,0.1); }
+  filter:brightness(1.4);
+  transform:scale(1.08);
 }
 @keyframes sprite-walk {
   0% { transform:translateY(0) scale(1); }
-  100% { transform:translateY(-4px) scale(1.02); }
+  100% { transform:translateY(-3px) scale(1.02); }
+}
+@keyframes sprite-breathe {
+  0%,100% { box-shadow:0 0 15px rgba(0,255,136,0.2); }
+  50% { box-shadow:0 0 35px rgba(0,255,136,0.4), 0 0 70px rgba(0,255,136,0.1); }
 }
 .agent-name-tag {
-  position:absolute; z-index:11;
+  position:absolute; z-index:15;
   font-family:'Orbitron',monospace;
-  font-size:clamp(6px,1vw,10px);
-  color:rgba(255,255,255,0.6);
+  font-size:clamp(6px,0.9vw,9px);
+  color:rgba(255,255,255,0.7);
   text-align:center;
-  width:clamp(60px,12vw,120px);
+  width:clamp(50px,10vw,100px);
   left:50%; transform:translateX(-50%);
   top:calc(100% + 4px);
   pointer-events:none;
   white-space:nowrap;
-  text-shadow:0 0 10px rgba(0,0,0,0.8);
+  text-shadow:0 0 8px rgba(0,0,0,0.9);
   letter-spacing:1px;
-  transition:all 0.5s;
+  transition:color 0.5s;
 }
-.agent-sprite.working ~ .agent-name-tag { color:#00ff88; text-shadow:0 0 10px rgba(0,255,136,0.3); }
-.agent-sprite.done ~ .agent-name-tag { color:#ffd700; text-shadow:0 0 10px rgba(255,215,0,0.3); }
-/* Glow de puesto */
-.desk-glow {
-  position:absolute; z-index:5;
-  width:clamp(60px,14vw,130px); height:clamp(60px,14vw,130px);
-  border-radius:50%;
-  pointer-events:none;
-  opacity:0;
-  transition:opacity 0.8s;
-  transform:translate(-50%,-50%);
-}
-.desk-glow.active { opacity:1; }
+.agent-sprite.working ~ .agent-name-tag { color:#00ff88; text-shadow:0 0 8px rgba(0,255,136,0.3); }
+.agent-sprite.done ~ .agent-name-tag { color:#ffd700; text-shadow:0 0 8px rgba(255,215,0,0.3); }
+.agent-sprite.walking ~ .agent-name-tag { color:#00ccff; }
 @media (max-width:600px) {
-  .agent-sprite { width:clamp(32px,12vw,50px); height:clamp(32px,12vw,50px); border-width:1.5px; }
-  .agent-name-tag { font-size:7px; }
+  .agent-sprite { width:clamp(28px,10vw,44px); height:clamp(28px,10vw,44px); border-width:1.5px; }
+  .agent-name-tag { font-size:6px; }
 }
-/* ===== TOGGLE VIEW ===== */
+/* Overlay completado - fix */
+#completion-overlay { z-index:999 !important; }/* ===== TOGGLE VIEW ===== */
 .view-toggle {
   display:flex; align-items:center; gap:4px;
   margin-left:auto; margin-right:10px;
@@ -493,14 +489,16 @@ function createCards() {
 }
 createCards();
 
-// ===== OFICINA CYBERPUNK CANVAS =====
-let desks = {};
+// ===== OFICINA CYBERPUNK V2 =====
 let deskPositions = [];
 let spriteElements = {};
-let glowElements = {};
-let agentAnimating = {};
+let agentStates = {}; // track last state for transitions
+let animatingAgents = {};
 
-// Dibujar oficina en canvas
+// Posiciones de las zonas de descanso (cafetería abajo-izquierda, gaming abajo-derecha)
+const BREAK_CENTER = { x: 0.25, y: 0.88 }; // cafetería
+const GAMING_CENTER = { x: 0.75, y: 0.88 }; // gaming
+
 function drawOffice() {
   const canvas = document.getElementById('office-canvas');
   if (!canvas) return;
@@ -508,255 +506,427 @@ function drawOffice() {
   const W = canvas.width = canvas.offsetWidth;
   const H = canvas.height = canvas.offsetHeight;
   
-  // Fondo oscuro
-  ctx.fillStyle = '#080808';
+  // ===== FONDO PRINCIPAL (más brillante) =====
+  ctx.fillStyle = '#121218';
   ctx.fillRect(0, 0, W, H);
   
-  // Suelo con losetas
-  const tileSize = Math.max(20, W / 35);
-  ctx.strokeStyle = 'rgba(212,175,55,0.03)';
+  // ===== SUELO CON LOSETAS =====
+  const tile = Math.max(24, W / 32);
+  ctx.strokeStyle = 'rgba(212,175,55,0.04)';
   ctx.lineWidth = 0.5;
-  for (let x = 0; x < W; x += tileSize) {
+  for (let x = 0; x < W; x += tile) {
     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
   }
-  for (let y = 0; y < H; y += tileSize) {
+  for (let y = 0; y < H; y += tile) {
     ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
   }
   
-  // Pasillo central
-  const midY = H / 2;
-  ctx.fillStyle = 'rgba(20,20,25,0.5)';
-  ctx.fillRect(0, midY - tileSize * 1.5, W, tileSize * 3);
-  ctx.strokeStyle = 'rgba(212,175,55,0.08)';
+  // ===== DISTRIBUCIÓN =====
+  // Área de trabajo: 0% - 68% de la altura
+  // Pasillo: 68% - 72%
+  // Área de descanso: 72% - 100%
+  const workBottom = H * 0.65;
+  const hallCenter = H * 0.70;
+  const breakTop = H * 0.74;
+  
+  // ===== PASILLO CENTRAL (horizontal entre cubiculos y descanso) =====
+  ctx.fillStyle = '#1a1a24';
+  ctx.fillRect(0, H * 0.66, W, H * 0.08);
+  ctx.strokeStyle = 'rgba(212,175,55,0.10)';
   ctx.lineWidth = 1;
-  ctx.setLineDash([8, 8]);
-  ctx.beginPath(); ctx.moveTo(0, midY); ctx.lineTo(W, midY); ctx.stroke();
+  ctx.setLineDash([6, 8]);
+  ctx.beginPath(); ctx.moveTo(0, hallCenter); ctx.lineTo(W, hallCenter); ctx.stroke();
   ctx.setLineDash([]);
   
-  // Calcular posiciones de los puestos
-  deskPositions = [];
-  const rows = 2;
-  const cols = 5;
-  const marginX = W * 0.06;
-  const marginY = H * 0.08;
-  const availW = W - marginX * 2;
-  const availH = (H - marginY * 2 - tileSize * 3) / 2;
+  // Líneas de luz de pasillo
+  for (let x = W * 0.1; x < W * 0.9; x += W * 0.15) {
+    ctx.fillStyle = 'rgba(255,215,0,0.04)';
+    ctx.beginPath();
+    ctx.arc(x, hallCenter, 8, 0, Math.PI * 2);
+    ctx.fill();
+  }
   
-  for (let row = 0; row < rows; row++) {
+  // ===== PASILLO VERTICAL ENTRE FILAS DE CUBÍCULOS =====
+  const hallY = H * 0.36;
+  ctx.fillStyle = '#1a1a24';
+  ctx.fillRect(0, H * 0.34, W, H * 0.04);
+  ctx.strokeStyle = 'rgba(212,175,55,0.06)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 6]);
+  ctx.beginPath(); ctx.moveTo(0, hallY); ctx.lineTo(W, hallY); ctx.stroke();
+  ctx.setLineDash([]);
+  
+  // ===== CALCULAR POSICIONES DE PUESTOS =====
+  deskPositions = [];
+  const marginX = W * 0.05;
+  const topAreaTop = H * 0.04;
+  const topAreaH = H * 0.26;
+  const botAreaTop = H * 0.40;
+  const botAreaH = H * 0.26;
+  const cols = 5;
+  
+  for (let row = 0; row < 2; row++) {
+    const areaTop = row === 0 ? topAreaTop : botAreaTop;
+    const areaH = row === 0 ? topAreaH : botAreaH;
+    
     for (let col = 0; col < cols; col++) {
-      const cx = marginX + availW * (col + 0.5) / cols;
-      const cy = marginY + availH * (row + 0.5) + (row > 0 ? tileSize * 3 : 0);
-      const deskW = availW / cols * 0.65;
-      const deskH = availH * 0.55;
-      
+      const cx = marginX + (W - marginX * 2) * (col + 0.5) / cols;
+      const cy = areaTop + areaH * 0.5;
+      const deskW = (W - marginX * 2) / cols * 0.55;
+      const deskH = areaH * 0.55;
       const x = cx - deskW / 2;
       const y = cy - deskH / 2;
       
       deskPositions.push({ cx, cy, x, y, w: deskW, h: deskH, row, col });
       
-      // === DIBUJAR CUBÍCULO ===
-      const pad = deskW * 0.08;
+      // ===== CUBÍCULO =====
+      const pad = deskW * 0.1;
+      const alpha = 0.20; // más visible
       
-      // Paredes del cubículo (líneas neón sutiles)
-      ctx.strokeStyle = 'rgba(212,175,55,0.12)';
+      // Sombra del cubículo
+      ctx.fillStyle = 'rgba(20,20,30,0.6)';
+      ctx.fillRect(x - pad, y - pad, deskW + pad * 2, deskH + pad * 2);
+      
+      // Paredes del cubículo (neón)
+      ctx.strokeStyle = `rgba(212,175,55,${alpha})`;
       ctx.lineWidth = 1.5;
-      // Pared trasera
+      
+      // Pared trasera (más gruesa)
       ctx.beginPath();
       ctx.moveTo(x - pad, y - pad);
       ctx.lineTo(x + deskW + pad, y - pad);
       ctx.stroke();
+      
       // Pared izquierda
       ctx.beginPath();
       ctx.moveTo(x - pad, y - pad);
       ctx.lineTo(x - pad, y + deskH + pad);
       ctx.stroke();
-      // Pared derecha  
+      
+      // Pared derecha
       ctx.beginPath();
       ctx.moveTo(x + deskW + pad, y - pad);
       ctx.lineTo(x + deskW + pad, y + deskH + pad);
       ctx.stroke();
       
-      // Brillo tenue del cubículo
-      ctx.fillStyle = 'rgba(212,175,55,0.02)';
-      ctx.fillRect(x - pad, y - pad, deskW + pad * 2, deskH + pad * 2);
+      // ===== MESA =====
+      const deskTop = y + deskH * 0.2;
+      const dW = deskW * 0.8;
+      const dH = deskH * 0.4;
+      const dX = cx - dW / 2;
       
-      // === MESA ===
-      const deskTop = y + deskH * 0.25;
-      const deskW2 = deskW * 0.85;
-      const deskH2 = deskH * 0.45;
-      const deskX = cx - deskW2 / 2;
-      
-      ctx.fillStyle = '#1a1a1a';
-      ctx.fillRect(deskX, deskTop, deskW2, deskH2);
-      ctx.strokeStyle = 'rgba(212,175,55,0.08)';
+      ctx.fillStyle = '#222230';
+      ctx.fillRect(dX, deskTop, dW, dH);
+      ctx.strokeStyle = 'rgba(212,175,55,0.10)';
       ctx.lineWidth = 0.5;
-      ctx.strokeRect(deskX, deskTop, deskW2, deskH2);
+      ctx.strokeRect(dX, deskTop, dW, dH);
       
-      // === MONITOR ===
-      const monW = deskW2 * 0.35;
-      const monH = deskH2 * 0.55;
-      const monX = cx - monW / 2;
-      const monY = deskTop - monH + 2;
+      // ===== MONITOR =====
+      const mW = dW * 0.3;
+      const mH = dH * 0.5;
+      const mX = cx - mW / 2;
+      const mY = deskTop - mH + 2;
       
-      // Base del monitor
-      ctx.fillStyle = '#222';
-      ctx.fillRect(cx - 3, deskTop, 6, 4);
-      
-      // Pantalla
       ctx.fillStyle = '#0a0a1a';
-      ctx.fillRect(monX, monY, monW, monH);
-      ctx.strokeStyle = 'rgba(212,175,55,0.1)';
+      ctx.fillRect(mX, mY, mW, mH);
+      ctx.strokeStyle = 'rgba(0,255,136,0.15)';
       ctx.lineWidth = 0.5;
-      ctx.strokeRect(monX, monY, monW, monH);
+      ctx.strokeRect(mX, mY, mW, mH);
       
-      // Brillo de pantalla (líneas de código)
-      for (let i = 0; i < 4; i++) {
-        const lx = monX + 3 + Math.random() * (monW - 6);
-        const ly = monY + 4 + i * (monH - 8) / 5;
-        ctx.fillStyle = `rgba(0,255,136,${0.05 + Math.random() * 0.1})`;
-        ctx.fillRect(lx, ly, monW * 0.5 - Math.random() * 0.3 * monW, 1.5);
+      // Brillo de pantalla (código Matrix)
+      const seed = col * 7 + row * 13;
+      for (let i = 0; i < 5; i++) {
+        const lx = mX + 3 + ((seed * 3 + i * 7) % parseInt(mW - 6));
+        const ly = mY + 4 + i * (mH - 8) / 6;
+        ctx.fillStyle = `rgba(0,255,136,${0.06 + (i % 3) * 0.04})`;
+        ctx.fillRect(lx, ly, 3 + (i % 4) * 2, 1.2);
       }
       
-      // === SILLA ===
-      const chairX = cx;
-      const chairY = deskTop + deskH2 + 8;
-      ctx.fillStyle = '#151515';
+      // Soporte monitor
+      ctx.fillStyle = '#333';
+      ctx.fillRect(cx - 2, deskTop, 4, 4);
+      
+      // ===== SILLA =====
+      const chairY = deskTop + dH + 6;
+      ctx.fillStyle = '#1a1a1a';
       ctx.beginPath();
-      ctx.arc(chairX, chairY, deskW * 0.1, 0, Math.PI * 2);
+      ctx.arc(cx, chairY, dW * 0.1, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = 'rgba(212,175,55,0.05)';
+      ctx.strokeStyle = 'rgba(212,175,55,0.04)';
       ctx.lineWidth = 0.5;
       ctx.stroke();
-      
-      // === CABLE / LUZ ===
-      ctx.fillStyle = row === 0 ? 'rgba(0,255,136,0.03)' : 'rgba(0,200,255,0.03)';
-      ctx.fillRect(cx - 1, y - pad, 2, 4);
     }
+  }
+  
+  // ===== LUCES DE TECHO =====
+  for (let i = 0; i < 6; i++) {
+    const lx = W * (0.1 + i * 0.16);
+    ctx.fillStyle = 'rgba(255,215,0,0.02)';
+    ctx.fillRect(lx - 15, 2, 30, 6);
+    ctx.fillStyle = 'rgba(255,215,0,0.03)';
+    ctx.beginPath();
+    ctx.moveTo(lx - 20, 6);
+    ctx.lineTo(lx + 20, 6);
+    ctx.lineTo(lx + 12, 20);
+    ctx.lineTo(lx - 12, 20);
+    ctx.fill();
+  }
+  
+  // ===== ZONA DE DESCANSO (CAFETERÍA + GAMING) =====
+  const bTop = H * 0.76;
+  const bH = H * 0.22;
+  const bMargin = W * 0.03;
+  const halfW = (W - bMargin * 3) / 2;
+  
+  // --- CAFETERÍA (izquierda) ---
+  const cafeX = bMargin;
+  const cafeW = halfW;
+  ctx.fillStyle = '#1a1a10';
+  ctx.fillRect(cafeX, bTop, cafeW, bH);
+  ctx.strokeStyle = 'rgba(212,175,55,0.12)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(cafeX, bTop, cafeW, bH);
+  
+  // Letrero CAFETERÍA
+  ctx.fillStyle = 'rgba(212,175,55,0.15)';
+  ctx.font = `${Math.max(8, Math.min(14, W/60))}px Orbitron`;
+  ctx.textAlign = 'center';
+  ctx.fillText('☕ BREAK', cafeX + cafeW / 2, bTop + 16);
+  
+  // Mesas de cafetería
+  for (let i = 0; i < 3; i++) {
+    const tx = cafeX + cafeW * (0.2 + i * 0.3);
+    const ty = bTop + bH * 0.5;
+    ctx.fillStyle = '#2a2a20';
+    ctx.fillRect(tx - 10, ty - 6, 20, 12);
+    ctx.strokeStyle = 'rgba(212,175,55,0.06)';
+    ctx.strokeRect(tx - 10, ty - 6, 20, 12);
+    // Sillas alrededor
+    for (let s = 0; s < 3; s++) {
+      const angle = s * 2.1 + 0.5;
+      const sx = tx + Math.cos(angle) * 16;
+      const sy = ty + Math.sin(angle) * 16;
+      ctx.fillStyle = '#222';
+      ctx.beginPath();
+      ctx.arc(sx, sy, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  
+  // --- GAMING ZONE (derecha) ---
+  const gameX = bMargin * 2 + halfW;
+  const gameW = halfW;
+  ctx.fillStyle = '#10101a';
+  ctx.fillRect(gameX, bTop, gameW, bH);
+  ctx.strokeStyle = 'rgba(0,200,255,0.12)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(gameX, bTop, gameW, bH);
+  
+  // Letrero GAMING
+  ctx.fillStyle = 'rgba(0,200,255,0.15)';
+  ctx.font = `${Math.max(8, Math.min(14, W/60))}px Orbitron`;
+  ctx.textAlign = 'center';
+  ctx.fillText('🎮 GAMING', gameX + gameW / 2, bTop + 16);
+  
+  // Sofás / mesas
+  ctx.fillStyle = '#1a1a2a';
+  ctx.fillRect(gameX + gameW * 0.15, bTop + bH * 0.35, gameW * 0.3, 14);
+  ctx.fillRect(gameX + gameW * 0.55, bTop + bH * 0.35, gameW * 0.3, 14);
+  
+  // Pantalla grande (neón)
+  ctx.fillStyle = '#0a0a20';
+  ctx.fillRect(gameX + gameW * 0.35, bTop + bH * 0.55, gameW * 0.3, bH * 0.3);
+  ctx.strokeStyle = 'rgba(0,200,255,0.15)';
+  ctx.lineWidth = 0.5;
+  ctx.strokeRect(gameX + gameW * 0.35, bTop + bH * 0.55, gameW * 0.3, bH * 0.3);
+  // Brillo pantalla
+  ctx.fillStyle = 'rgba(0,200,255,0.03)';
+  ctx.fillRect(gameX + gameW * 0.37, bTop + bH * 0.57, gameW * 0.26, bH * 0.2);
+  
+  // ===== NEO.DEPT en la parte superior =====
+  ctx.fillStyle = 'rgba(212,175,55,0.06)';
+  ctx.font = `${Math.max(7, Math.min(12, W/70))}px Orbitron`;
+  ctx.textAlign = 'center';
+  ctx.fillText('⋮ NEO.DEPT', W / 2, 14);
+  
+  // ===== SCANLINES =====
+  ctx.fillStyle = 'rgba(0,0,0,0.03)';
+  for (let y = 0; y < H; y += 3) {
+    ctx.fillRect(0, y, W, 1);
   }
 }
 
-// Crear sprites de agentes
+// ===== CREAR SPRITES =====
 function createAgentSprites() {
   const container = document.getElementById('agent-sprites');
-  const glowContainer = document.getElementById('desk-glows');
   if (!container) return;
   container.innerHTML = '';
-  glowContainer.innerHTML = '';
   spriteElements = {};
-  glowElements = {};
+  agentStates = {};
   
   agents.forEach((agent, idx) => {
-    // Glow del puesto
-    const glow = document.createElement('div');
-    glow.className = 'desk-glow';
-    glow.id = 'glow-' + agent.id;
-    glowContainer.appendChild(glow);
-    glowElements[agent.id] = glow;
-    
-    // Avatar del agente
     const sprite = document.createElement('div');
-    sprite.className = 'agent-sprite idle';
+    sprite.className = 'agent-sprite';
     sprite.id = 'sprite-' + agent.id;
     sprite.innerHTML = `<img src="${agent.photo}" alt="${agent.name}" onerror="this.style.display='none'">`;
     container.appendChild(sprite);
     
-    // Etiqueta de nombre
     const tag = document.createElement('div');
     tag.className = 'agent-name-tag';
     tag.textContent = agent.name;
-    sprite.parentNode.appendChild(tag);
+    container.appendChild(tag);
     
-    spriteElements[agent.id] = sprite;
+    spriteElements[agent.id] = { el: sprite, tag: tag, idx: idx };
+    agentStates[agent.id] = 'idle';
     
-    // Posición inicial: fuera de la pantalla (abajo)
-    sprite.style.left = '50%';
-    sprite.style.top = '110%';
-    sprite.style.transform = 'translateX(-50%)';
-    tag.style.left = '50%';
+    // Posición inicial: zona de descanso
+    const isLeft = idx < 5;
+    const rx = Math.random() * 0.3 + (isLeft ? 0.08 : 0.55);
+    const ry = 0.80 + Math.random() * 0.10;
+    
+    sprite.style.left = '0px';
+    sprite.style.top = '0px';
+    sprite.classList.add('idle');
+    sprite._targetX = 0; sprite._targetY = 0;
+    
+    // Posicionar al inicio
+    setTimeout(() => placeAgentInBreak(agent.id, true), idx * 50);
   });
-  
-  // Posicionar agentes en sus puestos (sin animación inicial)
-  setTimeout(() => {
-    agents.forEach((agent, idx) => {
-      if (idx < deskPositions.length) {
-        const pos = deskPositions[idx];
-        const sprite = spriteElements[agent.id];
-        const tag = sprite.nextElementSibling;
-        const glow = glowElements[agent.id];
-        if (sprite && pos) {
-          const vw = window.innerWidth;
-          const leftPct = (pos.cx / vw) * 100;
-          const topPct = (pos.cy / window.innerHeight) * 100;
-          sprite.style.left = pos.cx + 'px';
-          sprite.style.top = (pos.cy - 10) + 'px';
-          sprite.style.transform = 'translate(-50%,-50%)';
-          if (tag) { tag.style.left = pos.cx + 'px'; tag.style.top = (pos.cy + 10) + 'px'; }
-          if (glow) { glow.style.left = pos.cx + 'px'; glow.style.top = pos.cy + 'px'; }
-        }
-      }
-    });
-  }, 200);
 }
 
-// Animar agente caminando a su puesto
-function animateAgentToDesk(agentId) {
-  const sprite = spriteElements[agentId];
-  const idx = agents.findIndex(a => a.id === agentId);
-  if (!sprite || idx < 0 || idx >= deskPositions.length || agentAnimating[agentId]) return;
+function placeAgentInBreak(agentId, instant) {
+  const se = spriteElements[agentId];
+  if (!se) return;
+  const { el, tag, idx } = se;
+  const isLeft = idx < 5;
+  const canvas = document.getElementById('office-canvas');
+  if (!canvas) return;
+  const W = canvas.width || window.innerWidth;
+  const H = canvas.height || (window.innerHeight - 160);
   
+  // Posición aleatoria en la zona de descanso correspondiente
+  const areaX = isLeft ? 0.08 : 0.53;
+  const rx = areaX + Math.random() * 0.32;
+  const ry = 0.78 + Math.random() * 0.14;
+  
+  const px = rx * W;
+  const py = ry * H;
+  
+  if (instant) {
+    el.style.transition = 'none';
+    el.style.left = px + 'px';
+    el.style.top = py + 'px';
+    el.style.transform = 'translate(-50%,-50%)';
+    tag.style.left = px + 'px';
+    tag.style.top = (py + 20) + 'px';
+    tag.style.transform = 'translateX(-50%)';
+    el.offsetHeight;
+    el.style.transition = '';
+  }
+  el._targetX = px;
+  el._targetY = py;
+}
+
+// ===== ANIMAR AGENTE A SU PUESTO =====
+function animateToDesk(agentId) {
+  const se = spriteElements[agentId];
+  if (!se || deskPositions.length === 0) return;
+  const { el, tag, idx } = se;
+  if (idx >= deskPositions.length) return;
   const pos = deskPositions[idx];
-  if (!pos) return;
+  const canvas = document.getElementById('office-canvas');
+  if (!canvas) return;
+  const W = canvas.width;
+  const H = canvas.height;
   
-  agentAnimating[agentId] = true;
+  // 1. Primero mover a la entrada del pasillo
+  const hallX = pos.cx;
+  const hallY = H * 0.72; // entrada del pasillo horizontal
   
-  // 1. Aparecer desde abajo
-  sprite.classList.remove('idle', 'working', 'done');
-  sprite.classList.add('moving');
-  sprite.style.left = pos.cx + 'px';
-  sprite.style.top = '120%';
-  sprite.style.transform = 'translate(-50%,-50%)';
-  sprite.style.transition = 'none';
-  sprite.offsetHeight; // force reflow
+  el.classList.remove('idle', 'working', 'done');
+  el.classList.add('walking');
   
-  // 2. Caminar hacia el puesto
-  sprite.style.transition = 'all 1.5s cubic-bezier(0.34,1.56,0.64,1)';
-  sprite.style.top = (pos.cy - 10) + 'px';
+  // Mover al pasillo primero (transición rápida)
+  el.style.left = hallX + 'px';
+  el.style.top = hallY + 'px';
+  el.style.transform = 'translate(-50%,-50%)';
+  tag.style.left = hallX + 'px';
+  tag.style.top = (hallY + 20) + 'px';
   
-  // 3. Al llegar, cambiar a working
+  // 2. Luego subir al cubiculo
   setTimeout(() => {
-    sprite.classList.remove('moving');
-    sprite.classList.add('working');
-    sprite.style.top = (pos.cy - 10) + 'px';
-    const glow = glowElements[agentId];
-    if (glow) glow.classList.add('active');
-    agentAnimating[agentId] = false;
-  }, 1600);
+    el.style.left = pos.cx + 'px';
+    el.style.top = (pos.cy - 5) + 'px';
+    tag.style.left = pos.cx + 'px';
+    tag.style.top = (pos.cy + 18) + 'px';
+    
+    // 3. Llegó!
+    setTimeout(() => {
+      el.classList.remove('walking');
+      el.classList.add('working');
+      el.style.top = (pos.cy - 5) + 'px';
+      el._targetX = pos.cx;
+      el._targetY = pos.cy - 5;
+    }, 2200);
+  }, 2200);
 }
 
-// Actualizar sprite de agente
+// ===== ANIMAR AGENTE A ZONA DE DESCANSO =====
+function animateToBreak(agentId) {
+  const se = spriteElements[agentId];
+  if (!se) return;
+  const { el, tag, idx } = se;
+  const canvas = document.getElementById('office-canvas');
+  if (!canvas) return;
+  const H = canvas.height;
+  
+  // Ir al pasillo primero
+  const hallY = H * 0.72;
+  
+  el.classList.remove('working', 'done');
+  el.classList.add('walking');
+  
+  // Bajar al pasillo
+  el.style.top = hallY + 'px';
+  
+  setTimeout(() => {
+    // Luego a zona de descanso
+    placeAgentInBreak(agentId, false);
+    el.classList.remove('walking');
+    el.classList.add('idle');
+  }, 2500);
+}
+
+// ===== ACTUALIZAR SPRITE =====
 function updateAgentSprite(agentId, newStatus, task) {
-  const sprite = spriteElements[agentId];
-  if (!sprite) return;
+  const se = spriteElements[agentId];
+  if (!se) return;
+  const { el, tag } = se;
+  const prev = agentStates[agentId];
+  if (prev === newStatus) return;
   
-  if (newStatus === 'working' && sprite.classList.contains('idle')) {
-    // Si estaba idle, animar caminata
-    animateAgentToDesk(agentId);
-    return;
-  }
+  agentStates[agentId] = newStatus;
   
-  sprite.classList.remove('idle', 'working', 'done', 'moving');
-  sprite.classList.add(newStatus);
-  
-  const glow = glowElements[agentId];
-  if (glow) {
-    glow.classList.remove('active');
-    if (newStatus === 'working') glow.style.background = 'radial-gradient(ellipse,rgba(0,255,136,0.2),transparent 70%)';
-    else if (newStatus === 'done') glow.style.background = 'radial-gradient(ellipse,rgba(255,215,0,0.2),transparent 70%)';
-    if (newStatus !== 'idle') glow.classList.add('active');
+  if (newStatus === 'working' && prev === 'idle') {
+    // De descanso → a trabajar: caminar al puesto
+    animateToDesk(agentId);
+  } else if (newStatus === 'idle' && (prev === 'working' || prev === 'done')) {
+    // De trabajo → descanso: volver
+    animateToBreak(agentId);
+  } else if (newStatus === 'done') {
+    el.classList.remove('idle', 'walking', 'working');
+    el.classList.add('done');
+  } else if (newStatus === 'working') {
+    el.classList.remove('idle', 'walking', 'done');
+    el.classList.add('working');
+  } else if (newStatus === 'idle') {
+    el.classList.remove('working', 'done', 'walking');
+    el.classList.add('idle');
+    if (!el._targetX) placeAgentInBreak(agentId, true);
   }
 }
 
-// Sincronizar con updateAgent
+// ===== PARCHAR updateAgent =====
 updateAgent = (function(orig) {
   return function(agentId, newStatus, task, subtitle, progress, fromServer) {
     orig(agentId, newStatus, task, subtitle, progress, fromServer);
@@ -764,12 +934,13 @@ updateAgent = (function(orig) {
   };
 })(updateAgent);
 
-// View switching
+// ===== VIEW SWITCHING =====
 function switchView(view) {
   const grid = document.getElementById('agents-grid');
   const map = document.getElementById('office-map');
   const btnGrid = document.getElementById('btn-grid');
   const btnMap = document.getElementById('btn-map');
+  if (!grid || !map) return;
   if (view === 'grid') {
     grid.style.display = 'grid';
     map.style.display = 'none';
@@ -780,43 +951,23 @@ function switchView(view) {
     map.style.display = 'block';
     btnGrid.classList.remove('active');
     btnMap.classList.add('active');
-    if (!window._officeDrawn) {
-      drawOffice();
-      createAgentSprites();
-      window._officeDrawn = true;
-    }
-    // Re-dibujar oficina si cambia tamaño
-    setTimeout(() => { drawOffice(); }, 100);
+    drawOffice();
+    if (Object.keys(spriteElements).length === 0) createAgentSprites();
   }
 }
 
-// Redibujar oficina al cambiar tamaño
+// Resize handler
 window.addEventListener('resize', () => {
   if (document.getElementById('office-map').style.display === 'block') {
     drawOffice();
   }
 });
 
-// Crear al inicio
+// Inicializar
 setTimeout(() => {
   drawOffice();
   createAgentSprites();
-  window._officeDrawn = true;
-}, 500);
-
-// Sincronizar estados cada segundo
-setInterval(() => {
-  if (document.getElementById('office-map').style.display === 'none') return;
-  agents.forEach(a => {
-    const s = statuses[a.id];
-    if (s && spriteElements[a.id]) {
-      if (s.status === 'idle') {
-        spriteElements[a.id].classList.remove('working', 'done', 'moving');
-        spriteElements[a.id].classList.add('idle');
-      }
-    }
-  });
-}, 1000);
+}, 300);
 // Los agentes se actualizan vía pollStatus() con datos reales del monitor
 // Terminal, quotes, etc
 function startTerminal(agentId) {
@@ -934,6 +1085,8 @@ async function pollStatus() {
       if (prev && prev.status === u.status && prev.progress === u.progress && prev.task === u.task) return;
       lastServerState[key] = { status: u.status, progress: u.progress, task: u.task };
       updateAgent(u.agent, u.status, u.task || '', '', u.progress || 0, true);
+      // Check overlay from server updates too
+      setTimeout(checkAllDone, 500);
     });
     document.getElementById('connection-status').textContent = 'ONLINE';
   } catch(e) {}
@@ -1017,7 +1170,7 @@ function checkAllDone() {
 const _origUpdateAgent = updateAgent;
 updateAgent = function(agentId, newStatus, task, subtitle, progress, fromServer) {
   _origUpdateAgent(agentId, newStatus, task, subtitle, progress, fromServer);
-  if (!fromServer && newStatus === 'done') {
+  if (newStatus === 'done') {
     // Chequear si todos terminaron
     setTimeout(checkAllDone, 100);
   }
