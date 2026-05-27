@@ -149,8 +149,9 @@
       "score": 96.7,
       "conf": "high",
       "status": "open",
-      "pnl": 0,
-      "cp": 10.4
+      "pnl": -0.48,
+      "cp": 10.4,
+      "pnl_pct": 0.5
     }
   ],
   "trade_history": [
@@ -309,7 +310,7 @@
   "total_fees": 2.964695784531748,
   "total_pnl": -37.97,
   "started_at": "2026-05-27T19:35:23.169796+00:00",
-  "cycle": 261,
+  "cycle": 262,
   "last_price": 75254.01,
   "price_change_24h": 0.28,
   "signal": "WAIT",
@@ -427,7 +428,7 @@
   },
   "last_signal_ts": 0,
   "cooloff_until": 1779913800.165907,
-  "last_updated": "2026-05-27T20:50:05.747141+00:00",
+  "last_updated": "2026-05-27T20:55:17.446352+00:00",
   "prev_ema_fast": 75254.28746517828,
   "total_gas": 2.0,
   "markets_scanned": 885,
@@ -447,7 +448,7 @@
       "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
       "yp": 3.9,
       "sp": 0.1,
-      "vol": 23780138.276309475,
+      "vol": 23782006.817333475,
       "score": 96.6,
       "rec": "BUY_YES",
       "conf": "high"
@@ -457,7 +458,7 @@
       "slug": "will-brazil-win-the-2026-fifa-world-cup-183",
       "yp": 9.3,
       "sp": 0.1,
-      "vol": 22411425.736947067,
+      "vol": 22412913.12268507,
       "score": 96.6,
       "rec": "BUY_YES",
       "conf": "high"
@@ -467,7 +468,7 @@
       "slug": "will-argentina-win-the-2026-fifa-world-cup-245",
       "yp": 8.2,
       "sp": 0.1,
-      "vol": 22026988.91859196,
+      "vol": 22027078.04750596,
       "score": 96.5,
       "rec": "BUY_YES",
       "conf": "high"
@@ -477,7 +478,7 @@
       "slug": "will-germany-win-the-2026-fifa-world-cup-467",
       "yp": 5.1,
       "sp": 0.1,
-      "vol": 20943091.623697747,
+      "vol": 20943996.028311748,
       "score": 96.5,
       "rec": "BUY_YES",
       "conf": "high"
