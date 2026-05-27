@@ -1,6 +1,6 @@
 {
-  "capital": 17.818788241531106,
-  "portfolio_value": 62.63,
+  "capital": 11.58221235699522,
+  "portfolio_value": 62.03,
   "positions": [
     {
       "ts": "2026-05-27T19:57:00.159029+00:00",
@@ -89,8 +89,9 @@
       "score": 96.7,
       "conf": "high",
       "status": "open",
-      "pnl": 0,
-      "cp": 10.4
+      "pnl": -0.44,
+      "cp": 10.4,
+      "pnl_pct": 0.5
     },
     {
       "ts": "2026-05-27T20:44:05.470808+00:00",
@@ -108,8 +109,9 @@
       "score": 96.6,
       "conf": "high",
       "status": "open",
-      "pnl": 0,
-      "cp": 3.9
+      "pnl": -0.71,
+      "cp": 3.9,
+      "pnl_pct": -1.3
     },
     {
       "ts": "2026-05-27T20:44:05.470820+00:00",
@@ -127,8 +129,28 @@
       "score": 96.6,
       "conf": "high",
       "status": "open",
+      "pnl": -0.47,
+      "cp": 9.3,
+      "pnl_pct": 0.5
+    },
+    {
+      "ts": "2026-05-27T20:50:05.747086+00:00",
+      "market": "Will Portugal win the 2026 FIFA World Cup?",
+      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
+      "type": "BUY_YES",
+      "entry": 10.4,
+      "shares": 54.2,
+      "size": 5.64,
+      "gross": 6.24,
+      "fees": {
+        "total": 0.5998,
+        "gas": 0.5
+      },
+      "score": 96.7,
+      "conf": "high",
+      "status": "open",
       "pnl": 0,
-      "cp": 9.3
+      "cp": 10.4
     }
   ],
   "trade_history": [
@@ -259,16 +281,35 @@
       "status": "open",
       "pnl": 0,
       "cp": 9.3
+    },
+    {
+      "ts": "2026-05-27T20:50:05.747086+00:00",
+      "market": "Will Portugal win the 2026 FIFA World Cup?",
+      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
+      "type": "BUY_YES",
+      "entry": 10.4,
+      "shares": 54.2,
+      "size": 5.64,
+      "gross": 6.24,
+      "fees": {
+        "total": 0.5998,
+        "gas": 0.5
+      },
+      "score": 96.7,
+      "conf": "high",
+      "status": "open",
+      "pnl": 0,
+      "cp": 10.4
     }
   ],
-  "total_trades": 6,
+  "total_trades": 7,
   "winning_trades": 0,
   "best_trade": 0,
   "worst_trade": -0.11,
-  "total_fees": 2.3649105703791737,
-  "total_pnl": -37.37,
+  "total_fees": 2.964695784531748,
+  "total_pnl": -37.97,
   "started_at": "2026-05-27T19:35:23.169796+00:00",
-  "cycle": 260,
+  "cycle": 261,
   "last_price": 75254.01,
   "price_change_24h": 0.28,
   "signal": "WAIT",
@@ -386,9 +427,9 @@
   },
   "last_signal_ts": 0,
   "cooloff_until": 1779913800.165907,
-  "last_updated": "2026-05-27T20:44:05.470845+00:00",
+  "last_updated": "2026-05-27T20:50:05.747141+00:00",
   "prev_ema_fast": 75254.28746517828,
-  "total_gas": 1.5,
+  "total_gas": 2.0,
   "markets_scanned": 885,
   "opportunities": [
     {
@@ -396,7 +437,7 @@
       "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
       "yp": 10.4,
       "sp": 0.1,
-      "vol": 24746067.81916963,
+      "vol": 24750250.49583063,
       "score": 96.7,
       "rec": "BUY_YES",
       "conf": "high"
@@ -436,7 +477,7 @@
       "slug": "will-germany-win-the-2026-fifa-world-cup-467",
       "yp": 5.1,
       "sp": 0.1,
-      "vol": 20936759.029851742,
+      "vol": 20943091.623697747,
       "score": 96.5,
       "rec": "BUY_YES",
       "conf": "high"
