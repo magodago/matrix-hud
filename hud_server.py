@@ -113,6 +113,30 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_response(404)
                 self.end_headers()
                 
+        elif path == '/bot_status.json':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            bsp = '/tmp/neo-trading-bot/bot_status.json'
+            if os.path.exists(bsp):
+                with open(bsp, 'r') as f:
+                    self.wfile.write(f.read().encode())
+            else:
+                self.wfile.write(b'{"error": "no status"}')
+                
+        elif path == '/scalper.html':
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            sp = os.path.join(BASE, 'scalper.html')
+            if os.path.exists(sp):
+                with open(sp, 'rb') as f:
+                    self.wfile.write(f.read())
+            else:
+                self.wfile.write(b'<html><body><h1>Not found</h1></body></html>')
+                
         else:
             self.send_response(404)
             self.end_headers()
