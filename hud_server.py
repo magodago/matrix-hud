@@ -118,12 +118,18 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
+            # Leer desde archivo local si existe, si no desde cache
             bsp = '/tmp/neo-trading-bot/bot_status.json'
             if os.path.exists(bsp):
                 with open(bsp, 'r') as f:
                     self.wfile.write(f.read().encode())
             else:
-                self.wfile.write(b'{"error": "no status"}')
+                cache = os.path.join(BASE, 'bot_status_cache.json')
+                if os.path.exists(cache):
+                    with open(cache, 'r') as f:
+                        self.wfile.write(f.read().encode())
+                else:
+                    self.wfile.write(b'{"error":"no status"}')
                 
         elif path == '/scalper.html':
             self.send_response(200)
@@ -182,6 +188,24 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps({"error": str(e)}).encode())
+                
+        elif path == '/scalper-status':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length).decode()
+            try:
+                cache = os.path.join(BASE, 'bot_status_cache.json')
+                with open(cache, 'w') as f:
+                    f.write(body)
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(b'{"ok":true}')
+            except Exception as e:
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": str(e)}).encode())
+                
         else:
             self.send_response(404)
             self.end_headers()
