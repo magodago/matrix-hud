@@ -148,6 +148,24 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
 .task-time { color:#006600; margin-right:4px; }
 .task-agent { color:#00ff41; margin-right:4px; font-weight:bold; }
 .task-msg { color:#ccffcc; }
+/* Cortina Matrix */
+.matrix-curtain {
+  display:none;
+  width:calc(100% - 16px);
+  max-width:700px;
+  margin:0 auto 60px;
+  height:120px;
+  overflow:hidden;
+  border:1px solid #003300;
+  border-top:none;
+  background:#050505;
+  border-radius:0 0 4px 4px;
+}
+.matrix-curtain canvas {
+  display:block;
+  width:100%;
+  height:100%;
+}
 @media (min-width:701px) and (max-width:1100px) { .agents-grid { grid-template-columns:repeat(3,1fr); } }
 @media (max-width:700px) { .agents-grid { grid-template-columns:repeat(2,1fr); gap:5px; padding:4px 4px 40px; } }
 /* ===== MÓVIL (iPhone, < 600px) ===== */
@@ -368,7 +386,36 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
     <div class="task-line"><span class="task-time">[--:--:--]</span> <span class="task-agent">SISTEMA</span> <span class="task-msg">Inicializando Matrix HUD...</span></div>
   </div>
 </div>
+<!-- ===== CORTINA MATRIX RAIN ===== -->
+<div class="matrix-curtain" id="matrix-curtain">
+  <canvas id="curtain-canvas"></canvas>
+</div>
 <script>
+// ===== MATRIX CURTAIN RAIN =====
+const curtainCanvas = document.getElementById('curtain-canvas');
+const cctx = curtainCanvas.getContext('2d');
+let cW = 0, cH = 0, ccols = 0, cdrops = [];
+function initCurtain() {
+  cW = curtainCanvas.width = curtainCanvas.parentElement.offsetWidth;
+  cH = curtainCanvas.height = 120;
+  ccols = Math.floor(cW / 10);
+  cdrops = Array(ccols).fill(1).map(() => Math.random() * 12);
+}
+initCurtain();
+function drawCurtain() {
+  cctx.fillStyle = 'rgba(5,5,5,0.06)';
+  cctx.fillRect(0, 0, cW, cH);
+  cctx.font = '10px monospace';
+  for (let i = 0; i < cdrops.length; i++) {
+    const ch = String.fromCharCode(0x30A0 + Math.random() * 96);
+    cctx.fillStyle = Math.random() > 0.98 ? '#ccffcc' : Math.random() > 0.5 ? '#00ff41' : '#006600';
+    cctx.fillText(ch, i * 10, cdrops[i] * 10);
+    cdrops[i]++;
+    if (cdrops[i] * 10 > cH && Math.random() > 0.975) cdrops[i] = 0;
+  }
+}
+setInterval(drawCurtain, 60);
+window.addEventListener('resize', () => { initCurtain(); });
 // ===== HISTORIAL DE TAREAS =====
 const taskHistory = [];
 let taskHistoryIndex = 0;
@@ -743,19 +790,29 @@ function animateToBreak(agentId) {
 }
 
 // ===== ACTUALIZAR SPRITE =====
-function placeSpriteAt(agentId, px, py, cls) {
+function placeSpriteAt(agentId, px, py, cls, instant) {
   const se = spriteElements[agentId];
   if (!se) return;
   const { el, tag } = se;
   const d = getMapDims();
   const lx = px / 100 * d.w;
   const ly = py / 100 * d.h;
+  if (instant) {
+    el.style.transition = 'none';
+    tag.style.transition = 'none';
+  }
   el.classList.remove('idle', 'walking', 'working', 'done');
   if (cls) el.classList.add(cls);
   el.style.left = lx + 'px';
   el.style.top = ly + 'px';
   tag.style.left = lx + 'px';
   tag.style.top = (ly + 20) + 'px';
+  if (instant) {
+    // Forzar layout y restaurar transición
+    void el.offsetWidth;
+    el.style.transition = '';
+    tag.style.transition = '';
+  }
 }
 function updateAgentSprite(agentId, newStatus, task) {
   const se = spriteElements[agentId];
@@ -768,16 +825,25 @@ function updateAgentSprite(agentId, newStatus, task) {
   const map = document.getElementById('office-map');
   const mapVisible = map && map.style.display !== 'none' && map.offsetWidth > 0;
 
-  if (newStatus === 'working' && prev === 'idle') {
-    if (mapVisible) {
-      // ANIMADO: descanso → pasillo → puesto
-      animateToDesk(agentId);
+  if (newStatus === 'working' && prev !== 'working') {
+    // Cualquier estado → working: caminar de descanso a puesto
+    if (prev === 'done' || prev === 'idle') {
+      // Si venía de done (estaba en el puesto), primero teletransportar a descanso
+      if (prev === 'done') {
+        const bp = getBreakXY(idx);
+        placeSpriteAt(agentId, bp.x, bp.y, 'walking', true); // sin transición
+      }
+      if (mapVisible) {
+        animateToDesk(agentId);
+      } else {
+        const desk = getDeskXY(idx);
+        placeSpriteAt(agentId, desk.x, desk.y, 'working');
+      }
     } else {
-      // DIRECTO: poner en el puesto sin animación
       const desk = getDeskXY(idx);
       placeSpriteAt(agentId, desk.x, desk.y, 'working');
     }
-  } else if (newStatus === 'idle' && (prev === 'working' || prev === 'done')) {
+  } else if (newStatus === 'idle' && prev !== 'idle') {
     if (mapVisible) {
       animateToBreak(agentId);
     } else {
@@ -813,6 +879,7 @@ function switchView(view) {
   const grid = document.getElementById('agents-grid');
   const map = document.getElementById('office-map');
   const term = document.getElementById('task-terminal');
+  const curtain = document.getElementById('matrix-curtain');
   const btnGrid = document.getElementById('btn-grid');
   const btnMap = document.getElementById('btn-map');
   if (!grid || !map) return;
@@ -820,12 +887,14 @@ function switchView(view) {
     grid.style.display = 'grid';
     map.style.display = 'none';
     if (term) term.style.display = 'none';
+    if (curtain) curtain.style.display = 'none';
     btnGrid.classList.add('active');
     btnMap.classList.remove('active');
   } else {
     grid.style.display = 'none';
     map.style.display = 'block';
     if (term) term.style.display = 'block';
+    if (curtain) { curtain.style.display = 'block'; setTimeout(initCurtain, 50); }
     btnGrid.classList.remove('active');
     btnMap.classList.add('active');
     createAgentSprites();
@@ -833,7 +902,6 @@ function switchView(view) {
     agents.forEach(agent => {
       const a = lastServerState[agent.id];
       if (a && a.status !== 'idle') {
-        // Si no está idle, colocar en su puesto directamente
         const idx = agents.indexOf(agent);
         const desk = getDeskXY(idx);
         placeSpriteAt(agent.id, desk.x, desk.y, a.status === 'done' ? 'done' : 'working');
