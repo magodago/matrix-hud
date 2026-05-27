@@ -224,6 +224,70 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
 #map-terminal-area { flex:1; display:flex; flex-direction:column; min-height:0; width:100%; max-width:700px; margin:0 auto; }
 #map-terminal-area .task-terminal { flex-shrink:0; margin:6px 0 0; width:100%; max-width:100%; }
 #map-terminal-area .matrix-curtain { flex:1; min-height:60px; width:100%; max-width:100%; margin:0; border-radius:0 0 4px 4px; }
+/* ===== CEO FOOTER ===== */
+.ceo-footer {
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:14px 16px 20px;
+  margin:0;
+  background:linear-gradient(180deg, #080808 0%, #000 100%);
+  border:1px solid rgba(212,175,55,0.10);
+  border-top:1px solid rgba(212,175,55,0.06);
+  position:relative;
+  overflow:hidden;
+}
+.ceo-footer::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(212,175,55,0.20),transparent);
+}
+.ceo-photo {
+  width:48px; height:48px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid rgba(212,175,55,0.25);
+  box-shadow:0 0 15px rgba(212,175,55,0.06), inset 0 0 10px rgba(212,175,55,0.04);
+  flex-shrink:0;
+  transition:border-color 0.3s, box-shadow 0.3s;
+}
+.ceo-footer:hover .ceo-photo {
+  border-color:rgba(212,175,55,0.5);
+  box-shadow:0 0 25px rgba(212,175,55,0.12), inset 0 0 15px rgba(212,175,55,0.06);
+}
+.ceo-info { display:flex; flex-direction:column; gap:2px; }
+.ceo-name {
+  font-family:'Orbitron',monospace;
+  font-size:16px;
+  font-weight:900;
+  color:var(--gold);
+  letter-spacing:3px;
+  text-shadow:0 0 10px rgba(212,175,55,0.15);
+}
+.ceo-title {
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;
+  color:rgba(212,175,55,0.55);
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+.ceo-line {
+  margin-left:auto;
+  width:60px;
+  height:1px;
+  background:linear-gradient(90deg,rgba(212,175,55,0.20),transparent);
+  flex-shrink:0;
+}
+@media (max-width:600px) {
+  .ceo-footer { padding:10px 12px 16px; gap:10px; }
+  .ceo-photo { width:36px; height:36px; border-width:1.5px; }
+  .ceo-name { font-size:13px; letter-spacing:1.5px; }
+  .ceo-title { font-size:9px; letter-spacing:1px; }
+  .ceo-line { width:30px; }
+}
 /* ===== MAPA DE OFICINA CYBERPUNK V2 ===== */
 #office-map { display:none; position:relative; z-index:2; width:100%; background:url('/office_bg.png') center/contain no-repeat; overflow:hidden; min-height:300px; max-height:calc(100vh - 110px); aspect-ratio:4/3; margin:0 auto; background-color:#0d0d12; image-rendering:pixelated; flex-shrink:0; }
 #office-canvas { display:none; }
@@ -368,6 +432,15 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
 <!-- ===== CORTINA MATRIX RAIN ===== -->
 <div class="matrix-curtain" id="matrix-curtain">
   <canvas id="curtain-canvas"></canvas>
+</div>
+<!-- ===== CEO FOOTER ===== -->
+<div class="ceo-footer" id="ceo-footer">
+  <img src="/ceo-photo.jpg" alt="David Ortiz" class="ceo-photo" id="ceo-photo">
+  <div class="ceo-info">
+    <div class="ceo-name">DAVID ORTIZ</div>
+    <div class="ceo-title">CEO · NEO Agentic AI</div>
+  </div>
+  <div class="ceo-line"></div>
 </div>
 </div>
 </div>
