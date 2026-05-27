@@ -181,8 +181,8 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
 }
 
 /* ===== MAPA DE OFICINA CYBERPUNK V2 ===== */
-#office-map { display:none; position:relative; z-index:2; width:100%; height:calc(100vh - 110px); background:#0d0d12; overflow:hidden; min-height:420px; }
-#office-canvas { position:absolute; top:0; left:0; width:100%; height:100%; }
+#office-map { display:none; position:relative; z-index:2; width:100%; background:url('/office_bg.png') center/contain no-repeat; overflow:hidden; min-height:300px; max-height:calc(100vh - 110px); aspect-ratio:4/3; margin:0 auto; background-color:#0d0d12; image-rendering:pixelated; }
+#office-canvas { display:none; }
 /* Sprites de agentes */
 .agent-sprite {
   position:absolute; z-index:20;
@@ -316,9 +316,8 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
 <div class="agents-grid" id="agents-grid"></div>
 <!-- ===== OFICINA MAPA CYBERPUNK ===== -->
 <div id="office-map">
-  <canvas id="office-canvas"></canvas>
+  <img src="/office_bg.png" id="office-bg" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;image-rendering:pixelated;z-index:1;">
   <div id="agent-sprites" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;"></div>
-  <div id="desk-glows" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;pointer-events:none;"></div>
 </div>
 <div class="log-panel">
   <span>⏣ LOG</span>
@@ -489,274 +488,50 @@ function createCards() {
 }
 createCards();
 
-// ===== OFICINA CYBERPUNK V2 =====
-let deskPositions = [];
+// Posiciones fijas de los 10 puestos (en % del contenedor, basado en pixel-art 160x120)
+const DESK_POS = [
+  { x: 11.9, y: 15.8 },  // Morpheus
+  { x: 31.3, y: 15.8 },  // Trinity
+  { x: 50.6, y: 15.8 },  // Tank
+  { x: 70.0, y: 15.8 },  // Switch
+  { x: 89.4, y: 15.8 },  // Smith
+  { x: 11.9, y: 44.2 },  // Oracle
+  { x: 31.3, y: 44.2 },  // Keymaker
+  { x: 50.6, y: 44.2 },  // Sati
+  { x: 70.0, y: 44.2 },  // Mouse
+  { x: 89.4, y: 44.2 },  // Apoc
+];
+// Break area: izq=cafetería (agentes 0-4), der=gaming (agentes 5-9)
+const BREAK_AREAS = [
+  { xMin: 8, xMax: 45, yMin: 70, yMax: 92 },  // Cafetería
+  { xMin: 55, xMax: 92, yMin: 70, yMax: 92 },  // Gaming
+];
+
 let spriteElements = {};
-let agentStates = {}; // track last state for transitions
+let agentStates = {};
 let animatingAgents = {};
 
-// Posiciones de las zonas de descanso (cafetería abajo-izquierda, gaming abajo-derecha)
-const BREAK_CENTER = { x: 0.25, y: 0.88 }; // cafetería
-const GAMING_CENTER = { x: 0.75, y: 0.88 }; // gaming
-
-function drawOffice() {
-  const canvas = document.getElementById('office-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width = canvas.offsetWidth;
-  const H = canvas.height = canvas.offsetHeight;
-  
-  // ===== FONDO PRINCIPAL (más brillante) =====
-  ctx.fillStyle = '#121218';
-  ctx.fillRect(0, 0, W, H);
-  
-  // ===== SUELO CON LOSETAS =====
-  const tile = Math.max(24, W / 32);
-  ctx.strokeStyle = 'rgba(212,175,55,0.04)';
-  ctx.lineWidth = 0.5;
-  for (let x = 0; x < W; x += tile) {
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-  }
-  for (let y = 0; y < H; y += tile) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-  }
-  
-  // ===== DISTRIBUCIÓN =====
-  // Área de trabajo: 0% - 68% de la altura
-  // Pasillo: 68% - 72%
-  // Área de descanso: 72% - 100%
-  const workBottom = H * 0.65;
-  const hallCenter = H * 0.70;
-  const breakTop = H * 0.74;
-  
-  // ===== PASILLO CENTRAL (horizontal entre cubiculos y descanso) =====
-  ctx.fillStyle = '#1a1a24';
-  ctx.fillRect(0, H * 0.66, W, H * 0.08);
-  ctx.strokeStyle = 'rgba(212,175,55,0.10)';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([6, 8]);
-  ctx.beginPath(); ctx.moveTo(0, hallCenter); ctx.lineTo(W, hallCenter); ctx.stroke();
-  ctx.setLineDash([]);
-  
-  // Líneas de luz de pasillo
-  for (let x = W * 0.1; x < W * 0.9; x += W * 0.15) {
-    ctx.fillStyle = 'rgba(255,215,0,0.04)';
-    ctx.beginPath();
-    ctx.arc(x, hallCenter, 8, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  
-  // ===== PASILLO VERTICAL ENTRE FILAS DE CUBÍCULOS =====
-  const hallY = H * 0.36;
-  ctx.fillStyle = '#1a1a24';
-  ctx.fillRect(0, H * 0.34, W, H * 0.04);
-  ctx.strokeStyle = 'rgba(212,175,55,0.06)';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 6]);
-  ctx.beginPath(); ctx.moveTo(0, hallY); ctx.lineTo(W, hallY); ctx.stroke();
-  ctx.setLineDash([]);
-  
-  // ===== CALCULAR POSICIONES DE PUESTOS =====
-  deskPositions = [];
-  const marginX = W * 0.05;
-  const topAreaTop = H * 0.04;
-  const topAreaH = H * 0.26;
-  const botAreaTop = H * 0.40;
-  const botAreaH = H * 0.26;
-  const cols = 5;
-  
-  for (let row = 0; row < 2; row++) {
-    const areaTop = row === 0 ? topAreaTop : botAreaTop;
-    const areaH = row === 0 ? topAreaH : botAreaH;
-    
-    for (let col = 0; col < cols; col++) {
-      const cx = marginX + (W - marginX * 2) * (col + 0.5) / cols;
-      const cy = areaTop + areaH * 0.5;
-      const deskW = (W - marginX * 2) / cols * 0.55;
-      const deskH = areaH * 0.55;
-      const x = cx - deskW / 2;
-      const y = cy - deskH / 2;
-      
-      deskPositions.push({ cx, cy, x, y, w: deskW, h: deskH, row, col });
-      
-      // ===== CUBÍCULO =====
-      const pad = deskW * 0.1;
-      const alpha = 0.20; // más visible
-      
-      // Sombra del cubículo
-      ctx.fillStyle = 'rgba(20,20,30,0.6)';
-      ctx.fillRect(x - pad, y - pad, deskW + pad * 2, deskH + pad * 2);
-      
-      // Paredes del cubículo (neón)
-      ctx.strokeStyle = `rgba(212,175,55,${alpha})`;
-      ctx.lineWidth = 1.5;
-      
-      // Pared trasera (más gruesa)
-      ctx.beginPath();
-      ctx.moveTo(x - pad, y - pad);
-      ctx.lineTo(x + deskW + pad, y - pad);
-      ctx.stroke();
-      
-      // Pared izquierda
-      ctx.beginPath();
-      ctx.moveTo(x - pad, y - pad);
-      ctx.lineTo(x - pad, y + deskH + pad);
-      ctx.stroke();
-      
-      // Pared derecha
-      ctx.beginPath();
-      ctx.moveTo(x + deskW + pad, y - pad);
-      ctx.lineTo(x + deskW + pad, y + deskH + pad);
-      ctx.stroke();
-      
-      // ===== MESA =====
-      const deskTop = y + deskH * 0.2;
-      const dW = deskW * 0.8;
-      const dH = deskH * 0.4;
-      const dX = cx - dW / 2;
-      
-      ctx.fillStyle = '#222230';
-      ctx.fillRect(dX, deskTop, dW, dH);
-      ctx.strokeStyle = 'rgba(212,175,55,0.10)';
-      ctx.lineWidth = 0.5;
-      ctx.strokeRect(dX, deskTop, dW, dH);
-      
-      // ===== MONITOR =====
-      const mW = dW * 0.3;
-      const mH = dH * 0.5;
-      const mX = cx - mW / 2;
-      const mY = deskTop - mH + 2;
-      
-      ctx.fillStyle = '#0a0a1a';
-      ctx.fillRect(mX, mY, mW, mH);
-      ctx.strokeStyle = 'rgba(0,255,136,0.15)';
-      ctx.lineWidth = 0.5;
-      ctx.strokeRect(mX, mY, mW, mH);
-      
-      // Brillo de pantalla (código Matrix)
-      const seed = col * 7 + row * 13;
-      for (let i = 0; i < 5; i++) {
-        const lx = mX + 3 + ((seed * 3 + i * 7) % parseInt(mW - 6));
-        const ly = mY + 4 + i * (mH - 8) / 6;
-        ctx.fillStyle = `rgba(0,255,136,${0.06 + (i % 3) * 0.04})`;
-        ctx.fillRect(lx, ly, 3 + (i % 4) * 2, 1.2);
-      }
-      
-      // Soporte monitor
-      ctx.fillStyle = '#333';
-      ctx.fillRect(cx - 2, deskTop, 4, 4);
-      
-      // ===== SILLA =====
-      const chairY = deskTop + dH + 6;
-      ctx.fillStyle = '#1a1a1a';
-      ctx.beginPath();
-      ctx.arc(cx, chairY, dW * 0.1, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(212,175,55,0.04)';
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
-    }
-  }
-  
-  // ===== LUCES DE TECHO =====
-  for (let i = 0; i < 6; i++) {
-    const lx = W * (0.1 + i * 0.16);
-    ctx.fillStyle = 'rgba(255,215,0,0.02)';
-    ctx.fillRect(lx - 15, 2, 30, 6);
-    ctx.fillStyle = 'rgba(255,215,0,0.03)';
-    ctx.beginPath();
-    ctx.moveTo(lx - 20, 6);
-    ctx.lineTo(lx + 20, 6);
-    ctx.lineTo(lx + 12, 20);
-    ctx.lineTo(lx - 12, 20);
-    ctx.fill();
-  }
-  
-  // ===== ZONA DE DESCANSO (CAFETERÍA + GAMING) =====
-  const bTop = H * 0.76;
-  const bH = H * 0.22;
-  const bMargin = W * 0.03;
-  const halfW = (W - bMargin * 3) / 2;
-  
-  // --- CAFETERÍA (izquierda) ---
-  const cafeX = bMargin;
-  const cafeW = halfW;
-  ctx.fillStyle = '#1a1a10';
-  ctx.fillRect(cafeX, bTop, cafeW, bH);
-  ctx.strokeStyle = 'rgba(212,175,55,0.12)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(cafeX, bTop, cafeW, bH);
-  
-  // Letrero CAFETERÍA
-  ctx.fillStyle = 'rgba(212,175,55,0.15)';
-  ctx.font = `${Math.max(8, Math.min(14, W/60))}px Orbitron`;
-  ctx.textAlign = 'center';
-  ctx.fillText('☕ BREAK', cafeX + cafeW / 2, bTop + 16);
-  
-  // Mesas de cafetería
-  for (let i = 0; i < 3; i++) {
-    const tx = cafeX + cafeW * (0.2 + i * 0.3);
-    const ty = bTop + bH * 0.5;
-    ctx.fillStyle = '#2a2a20';
-    ctx.fillRect(tx - 10, ty - 6, 20, 12);
-    ctx.strokeStyle = 'rgba(212,175,55,0.06)';
-    ctx.strokeRect(tx - 10, ty - 6, 20, 12);
-    // Sillas alrededor
-    for (let s = 0; s < 3; s++) {
-      const angle = s * 2.1 + 0.5;
-      const sx = tx + Math.cos(angle) * 16;
-      const sy = ty + Math.sin(angle) * 16;
-      ctx.fillStyle = '#222';
-      ctx.beginPath();
-      ctx.arc(sx, sy, 4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-  
-  // --- GAMING ZONE (derecha) ---
-  const gameX = bMargin * 2 + halfW;
-  const gameW = halfW;
-  ctx.fillStyle = '#10101a';
-  ctx.fillRect(gameX, bTop, gameW, bH);
-  ctx.strokeStyle = 'rgba(0,200,255,0.12)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(gameX, bTop, gameW, bH);
-  
-  // Letrero GAMING
-  ctx.fillStyle = 'rgba(0,200,255,0.15)';
-  ctx.font = `${Math.max(8, Math.min(14, W/60))}px Orbitron`;
-  ctx.textAlign = 'center';
-  ctx.fillText('🎮 GAMING', gameX + gameW / 2, bTop + 16);
-  
-  // Sofás / mesas
-  ctx.fillStyle = '#1a1a2a';
-  ctx.fillRect(gameX + gameW * 0.15, bTop + bH * 0.35, gameW * 0.3, 14);
-  ctx.fillRect(gameX + gameW * 0.55, bTop + bH * 0.35, gameW * 0.3, 14);
-  
-  // Pantalla grande (neón)
-  ctx.fillStyle = '#0a0a20';
-  ctx.fillRect(gameX + gameW * 0.35, bTop + bH * 0.55, gameW * 0.3, bH * 0.3);
-  ctx.strokeStyle = 'rgba(0,200,255,0.15)';
-  ctx.lineWidth = 0.5;
-  ctx.strokeRect(gameX + gameW * 0.35, bTop + bH * 0.55, gameW * 0.3, bH * 0.3);
-  // Brillo pantalla
-  ctx.fillStyle = 'rgba(0,200,255,0.03)';
-  ctx.fillRect(gameX + gameW * 0.37, bTop + bH * 0.57, gameW * 0.26, bH * 0.2);
-  
-  // ===== NEO.DEPT en la parte superior =====
-  ctx.fillStyle = 'rgba(212,175,55,0.06)';
-  ctx.font = `${Math.max(7, Math.min(12, W/70))}px Orbitron`;
-  ctx.textAlign = 'center';
-  ctx.fillText('⋮ NEO.DEPT', W / 2, 14);
-  
-  // ===== SCANLINES =====
-  ctx.fillStyle = 'rgba(0,0,0,0.03)';
-  for (let y = 0; y < H; y += 3) {
-    ctx.fillRect(0, y, W, 1);
-  }
+function getDeskXY(idx) {
+  if (idx < 0 || idx >= DESK_POS.length) return { x: 50, y: 50 };
+  return DESK_POS[idx];
 }
 
-// ===== CREAR SPRITES =====
+function getBreakXY(idx) {
+  const area = idx < 5 ? BREAK_AREAS[0] : BREAK_AREAS[1];
+  // Seed-based random para posición consistente
+  const seed = idx * 7.3;
+  const rx = area.xMin + ((seed * 13) % (area.xMax - area.xMin + 1));
+  const ry = area.yMin + ((seed * 7) % (area.yMax - area.yMin + 1));
+  return { x: rx, y: ry };
+}
+
+function posToPixels(px, py) {
+  const map = document.getElementById('office-map');
+  if (!map) return { x: 0, y: 0 };
+  return { x: map.offsetWidth * px / 100, y: map.offsetHeight * py / 100 };
+}
+
+// Crear sprites de agentes
 function createAgentSprites() {
   const container = document.getElementById('agent-sprites');
   if (!container) return;
@@ -766,7 +541,7 @@ function createAgentSprites() {
   
   agents.forEach((agent, idx) => {
     const sprite = document.createElement('div');
-    sprite.className = 'agent-sprite';
+    sprite.className = 'agent-sprite idle';
     sprite.id = 'sprite-' + agent.id;
     sprite.innerHTML = `<img src="${agent.photo}" alt="${agent.name}" onerror="this.style.display='none'">`;
     container.appendChild(sprite);
@@ -780,121 +555,93 @@ function createAgentSprites() {
     agentStates[agent.id] = 'idle';
     
     // Posición inicial: zona de descanso
-    const isLeft = idx < 5;
-    const rx = Math.random() * 0.3 + (isLeft ? 0.08 : 0.55);
-    const ry = 0.80 + Math.random() * 0.10;
+    const bp = getBreakXY(idx);
+    const pp = posToPixels(bp.x, bp.y);
     
-    sprite.style.left = '0px';
-    sprite.style.top = '0px';
-    sprite.classList.add('idle');
-    sprite._targetX = 0; sprite._targetY = 0;
-    
-    // Posicionar al inicio
-    setTimeout(() => placeAgentInBreak(agent.id, true), idx * 50);
+    sprite.style.left = pp.x + 'px';
+    sprite.style.top = pp.y + 'px';
+    sprite.style.transform = 'translate(-50%,-50%)';
+    tag.style.left = pp.x + 'px';
+    tag.style.top = (pp.y + 18) + 'px';
+    tag.style.transform = 'translateX(-50%)';
   });
 }
 
-function placeAgentInBreak(agentId, instant) {
+// Animar agente de descanso → puesto
+function animateToDesk(agentId) {
   const se = spriteElements[agentId];
   if (!se) return;
   const { el, tag, idx } = se;
-  const isLeft = idx < 5;
-  const canvas = document.getElementById('office-canvas');
-  if (!canvas) return;
-  const W = canvas.width || window.innerWidth;
-  const H = canvas.height || (window.innerHeight - 160);
+  const desk = getDeskXY(idx);
+  const hallY = 60; // % pasillo horizontal
   
-  // Posición aleatoria en la zona de descanso correspondiente
-  const areaX = isLeft ? 0.08 : 0.53;
-  const rx = areaX + Math.random() * 0.32;
-  const ry = 0.78 + Math.random() * 0.14;
-  
-  const px = rx * W;
-  const py = ry * H;
-  
-  if (instant) {
-    el.style.transition = 'none';
-    el.style.left = px + 'px';
-    el.style.top = py + 'px';
-    el.style.transform = 'translate(-50%,-50%)';
-    tag.style.left = px + 'px';
-    tag.style.top = (py + 20) + 'px';
-    tag.style.transform = 'translateX(-50%)';
-    el.offsetHeight;
-    el.style.transition = '';
-  }
-  el._targetX = px;
-  el._targetY = py;
-}
-
-// ===== ANIMAR AGENTE A SU PUESTO =====
-function animateToDesk(agentId) {
-  const se = spriteElements[agentId];
-  if (!se || deskPositions.length === 0) return;
-  const { el, tag, idx } = se;
-  if (idx >= deskPositions.length) return;
-  const pos = deskPositions[idx];
-  const canvas = document.getElementById('office-canvas');
-  if (!canvas) return;
-  const W = canvas.width;
-  const H = canvas.height;
-  
-  // 1. Primero mover a la entrada del pasillo
-  const hallX = pos.cx;
-  const hallY = H * 0.72; // entrada del pasillo horizontal
+  const map = document.getElementById('office-map');
+  if (!map) return;
+  const mw = map.offsetWidth, mh = map.offsetHeight;
   
   el.classList.remove('idle', 'working', 'done');
   el.classList.add('walking');
   
-  // Mover al pasillo primero (transición rápida)
-  el.style.left = hallX + 'px';
-  el.style.top = hallY + 'px';
-  el.style.transform = 'translate(-50%,-50%)';
-  tag.style.left = hallX + 'px';
-  tag.style.top = (hallY + 20) + 'px';
+  // 1. Ir al pasillo
+  const hx = desk.x / 100 * mw;
+  const hy = hallY / 100 * mh;
+  el.style.left = hx + 'px';
+  el.style.top = hy + 'px';
+  tag.style.left = hx + 'px';
+  tag.style.top = (hy + 18) + 'px';
   
-  // 2. Luego subir al cubiculo
+  // 2. Subir al cubiculo
   setTimeout(() => {
-    el.style.left = pos.cx + 'px';
-    el.style.top = (pos.cy - 5) + 'px';
-    tag.style.left = pos.cx + 'px';
-    tag.style.top = (pos.cy + 18) + 'px';
+    const dx = desk.x / 100 * mw;
+    const dy = desk.y / 100 * mh;
+    el.style.left = dx + 'px';
+    el.style.top = dy + 'px';
+    tag.style.left = dx + 'px';
+    tag.style.top = (dy + 18) + 'px';
     
-    // 3. Llegó!
+    // 3. Llegó
     setTimeout(() => {
       el.classList.remove('walking');
       el.classList.add('working');
-      el.style.top = (pos.cy - 5) + 'px';
-      el._targetX = pos.cx;
-      el._targetY = pos.cy - 5;
-    }, 2200);
-  }, 2200);
+    }, 1800);
+  }, 1800);
 }
 
-// ===== ANIMAR AGENTE A ZONA DE DESCANSO =====
+// Animar agente de puesto → descanso
 function animateToBreak(agentId) {
   const se = spriteElements[agentId];
   if (!se) return;
   const { el, tag, idx } = se;
-  const canvas = document.getElementById('office-canvas');
-  if (!canvas) return;
-  const H = canvas.height;
-  
-  // Ir al pasillo primero
-  const hallY = H * 0.72;
+  const bp = getBreakXY(idx);
+  const map = document.getElementById('office-map');
+  if (!map) return;
+  const mw = map.offsetWidth, mh = map.offsetHeight;
+  const hallY = 60 / 100 * mh;
   
   el.classList.remove('working', 'done');
   el.classList.add('walking');
   
-  // Bajar al pasillo
+  // Ir al pasillo
+  const desk = getDeskXY(idx);
+  const hx = desk.x / 100 * mw;
+  el.style.left = hx + 'px';
   el.style.top = hallY + 'px';
+  tag.style.left = hx + 'px';
+  tag.style.top = (hallY + 18) + 'px';
   
   setTimeout(() => {
-    // Luego a zona de descanso
-    placeAgentInBreak(agentId, false);
-    el.classList.remove('walking');
-    el.classList.add('idle');
-  }, 2500);
+    const bx = bp.x / 100 * mw;
+    const by = bp.y / 100 * mh;
+    el.style.left = bx + 'px';
+    el.style.top = by + 'px';
+    tag.style.left = bx + 'px';
+    tag.style.top = (by + 18) + 'px';
+    
+    setTimeout(() => {
+      el.classList.remove('walking');
+      el.classList.add('idle');
+    }, 2200);
+  }, 2200);
 }
 
 // ===== ACTUALIZAR SPRITE =====
@@ -951,21 +698,15 @@ function switchView(view) {
     map.style.display = 'block';
     btnGrid.classList.remove('active');
     btnMap.classList.add('active');
-    drawOffice();
-    if (Object.keys(spriteElements).length === 0) createAgentSprites();
+    createAgentSprites();
   }
 }
 
 // Resize handler
-window.addEventListener('resize', () => {
-  if (document.getElementById('office-map').style.display === 'block') {
-    drawOffice();
-  }
-});
+window.addEventListener('resize', () => {});
 
 // Inicializar
 setTimeout(() => {
-  drawOffice();
   createAgentSprites();
 }, 300);
 // Los agentes se actualizan vía pollStatus() con datos reales del monitor

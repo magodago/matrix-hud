@@ -72,7 +72,7 @@ class Handler(BaseHTTPRequestHandler):
             with open(STATUS_FILE, 'r') as f:
                 self.wfile.write(f.read().encode())
                 
-        elif path in ('/favicon.ico', '/apple-touch-icon.png', '/icon-512.png'):
+        elif path in ('/favicon.ico', '/apple-touch-icon.png', '/icon-512.png', '/office_bg.png'):
             # Servir iconos desde la raíz del proyecto
             filename = path.lstrip('/')
             icon_path = os.path.join(BASE, filename)
