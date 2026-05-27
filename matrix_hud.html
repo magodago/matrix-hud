@@ -934,6 +934,7 @@ function switchView(view) {
     grid.style.display = 'none';
     if (mapContent) { mapContent.style.display = 'flex'; }
     map.style.display = 'block';
+    if (term) term.style.display = 'block';
     if (curtain) curtain.style.display = 'block';
     if (termArea) termArea.style.display = 'flex';
     btnGrid.classList.remove('active');
