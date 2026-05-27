@@ -27,7 +27,7 @@ html, body { background: #000; font-family: 'Share Tech Mono', monospace; color:
   0%,100% { border-color:rgba(212,175,55,0.08); box-shadow:0 0 5px rgba(212,175,55,0.03); }
   50% { border-color:rgba(212,175,55,0.30); box-shadow:0 0 15px rgba(212,175,55,0.08); }
 }
-.header { position:relative; z-index:2; padding:12px 20px 6px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(212,175,55,0.10); }
+.header { position:relative; z-index:2; padding:max(12px, env(safe-area-inset-top, 12px)) 20px 6px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(212,175,55,0.10); }
 .header h1 { font-family:'Orbitron',monospace; font-size:18px; font-weight:900; color:var(--gold); letter-spacing:3px; text-shadow:0 0 10px rgba(212,175,55,0.3); }
 #clock { font-family:'Orbitron',monospace; font-size:11px; color:rgba(212,175,55,0.5); letter-spacing:2px; margin-left:20px; }
 .header .status-bar { margin-left:auto; display:flex; align-items:center; gap:8px; font-size:10px; color:rgba(255,255,255,0.35); }
@@ -180,7 +180,7 @@ html, body { background: #000; font-family: 'Share Tech Mono', monospace; color:
 }
 
 /* ===== MAPA DE OFICINA ===== */
-#office-map { display:none; position:relative; z-index:2; width:100%; height:calc(100vh - 50px); background:#050505; overflow:hidden; }
+#office-map { display:none; position:relative; z-index:2; width:100%; height:calc(100vh - 50px - env(safe-area-inset-top, 0px)); background:#050505; overflow:hidden; min-height:400px; }
 #office-map canvas { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
 .office-floor { position:absolute; top:0; left:0; width:100%; height:100%; }
 .desk-row { display:flex; justify-content:center; gap:clamp(8px,2vw,24px); position:absolute; width:100%; padding:0 2%; }
@@ -282,25 +282,31 @@ html, body { background: #000; font-family: 'Share Tech Mono', monospace; color:
 .desk.done .desk-name { color:#ffd700; text-shadow:0 0 10px rgba(255,215,0,0.3); }
 /* ===== TOGGLE VIEW ===== */
 .view-toggle {
-  display:flex; align-items:center; gap:2px;
+  display:flex; align-items:center; gap:4px;
   margin-left:auto; margin-right:10px;
   font-family:'Share Tech Mono',monospace;
-  font-size:10px;
+  font-size:12px;
+  flex-shrink:0;
 }
 .view-toggle .view-btn {
-  padding:3px 8px; cursor:pointer;
+  padding:6px 14px; cursor:pointer;
   color:rgba(255,255,255,0.25);
   border:1px solid rgba(212,175,55,0.08);
-  border-radius:3px;
+  border-radius:4px;
   transition:all 0.3s;
   background:transparent;
-  font-family:'Share Tech Mono',monospace;
-  font-size:10px;
+  font-family:'Orbitron',monospace;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1px;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
 }
-.view-toggle .view-btn.active { color:#d4af37; border-color:#d4af37; background:rgba(212,175,55,0.06); }
+.view-toggle .view-btn.active { color:#d4af37; border-color:#d4af37; background:rgba(212,175,55,0.08); box-shadow:0 0 10px rgba(212,175,55,0.06); }
 .view-toggle .view-btn:hover { color:rgba(255,255,255,0.5); }
 @media (max-width:600px) {
-  .view-toggle .view-btn { font-size:8px; padding:2px 5px; }
+  .view-toggle { margin-right:4px; gap:3px; }
+  .view-toggle .view-btn { font-size:9px; padding:4px 10px; letter-spacing:0.5px; }
 }
 /* Hallway line */
 .hallway-line {
@@ -611,6 +617,9 @@ createCards = function() {
     updateDesk(a.id, s.status, s.task || '');
   });
 };
+
+// LLAMADA DIRECTA: crear mapa ahora (no solo en el parche)
+setTimeout(createOfficeMap, 100);
 
 // Monitoreo de estado para mapa
 setInterval(() => {
