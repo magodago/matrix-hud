@@ -14,7 +14,7 @@
   --card-bg: rgba(0,0,0,0.95);
   --text-box-bg: #000000;
 }
-body { background: #000; font-family: 'Share Tech Mono', monospace; color: #fff; overflow: hidden; height: 100vh; width: 100vw; }
+html, body { background: #000; font-family: 'Share Tech Mono', monospace; color: #fff; height: 100%; min-height: 100vh; width: 100vw; overflow-x: hidden; overflow-y: auto; }
 #neural-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:1; pointer-events:none; opacity:0.3; }
 #matrix-rain { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; opacity:0.12; }
 .text-box { background:var(--text-box-bg); border:1px solid rgba(212,175,55,0.10); border-radius:2px; padding:2px 5px; margin:1px 0; animation:breathe-gold 3.5s ease-in-out infinite; }
@@ -28,7 +28,7 @@ body { background: #000; font-family: 'Share Tech Mono', monospace; color: #fff;
 .header .status-bar { margin-left:auto; display:flex; align-items:center; gap:8px; font-size:10px; color:rgba(255,255,255,0.35); }
 .status-dot { width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse-dot 2s infinite; }
 @keyframes pulse-dot { 0%,100%{opacity:1;box-shadow:0 0 6px var(--gold)} 50%{opacity:0.3;box-shadow:0 0 2px var(--gold)} }
-.agents-grid { position:relative; z-index:2; display:grid; grid-template-columns:repeat(5,1fr); gap:8px; padding:8px 10px; height:calc(100vh - 50px); overflow-y:auto; }
+.agents-grid { position:relative; z-index:2; display:grid; grid-template-columns:repeat(5,1fr); gap:8px; padding:8px 10px 40px; min-height:calc(100vh - 50px); height:auto; overflow:visible; }
 .agents-grid::-webkit-scrollbar { width:4px; }
 .agents-grid::-webkit-scrollbar-thumb { background:rgba(212,175,55,0.2); border-radius:2px; }
 /* CARD */
@@ -101,7 +101,56 @@ body { background: #000; font-family: 'Share Tech Mono', monospace; color: #fff;
 .log-panel { position:fixed; bottom:0; left:0; width:100%; height:26px; background:#000; border-top:1px solid rgba(212,175,55,0.06); z-index:5; display:flex; align-items:center; padding:0 12px; font-size:10px; color:rgba(255,255,255,0.25); }
 .log-text { color:var(--gold); margin-left:4px; overflow:hidden; white-space:nowrap; }
 @media (max-width:1100px) { .agents-grid { grid-template-columns:repeat(3,1fr); } }
-@media (max-width:700px) { .agents-grid { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:700px) { .agents-grid { grid-template-columns:repeat(3,1fr); gap:4px; padding:4px 4px 40px; } }
+/* ===== MÓVIL (iPhone, < 600px) ===== */
+@media (max-width:600px) {
+  html, body { overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .agents-grid { grid-template-columns:repeat(3,1fr); gap:3px; padding:4px 3px 40px; }
+  .agent-card { border-radius:4px; border-width:1px; }
+  .agent-card.idle { opacity:0.6; }
+  /* OCULTAR foto y efectos visuales pesados en móvil */
+  .agent-photo { display:none !important; }
+  .shockwave { display:none !important; }
+  .particles { display:none !important; }
+  .glitch-overlay { display:none !important; }
+  .photo-static { display:none !important; }
+  .scan-beam { display:none !important; }
+  .photo-badge { display:none !important; }
+  .scanlines { display:none !important; }
+  .text-box { padding:1px 3px; margin:1px 0; animation:none; border-color:rgba(212,175,55,0.06); }
+  .agent-info { gap:2px; flex-wrap:wrap; }
+  .agent-name { font-size:8px; letter-spacing:0.5px; }
+  .agent-tagline { display:none; }
+  .agent-status { font-size:6px; padding:0 3px; }
+  .agent-progress-row .pct { font-size:14px; }
+  .agent-terminal { display:none !important; }
+  .agent-quote { display:none !important; }
+  .agent-task { font-size:7px; max-height:14px; padding:1px 2px; }
+  .header { padding:6px 8px 4px; gap:6px; }
+  .header h1 { font-size:12px; letter-spacing:1px; }
+  #clock { font-size:8px; margin-left:8px; }
+  .header .status-bar { font-size:8px; gap:4px; }
+  .log-panel { display:none !important; }
+  #neural-canvas { display:none !important; }
+  #matrix-rain { display:none !important; }
+  .scanlines { display:none !important; }
+  /* Borde activo visible sin foto */
+  .agent-card.active { border-width:1.5px; }
+}
+/* ===== MÓVIL GRANDE (600-900px) ===== */
+@media (min-width:601px) and (max-width:900px) {
+  .agents-grid { grid-template-columns:repeat(3,1fr); gap:5px; padding:6px 6px 40px; }
+  .agent-photo { padding-bottom:28%; }
+  .agent-name { font-size:9px; }
+  .agent-tagline { display:none; }
+  .agent-progress-row .pct { font-size:18px; }
+  .agent-terminal { min-height:24px; max-height:24px; font-size:6px; }
+  .agent-quote { display:none; }
+  .agent-task { font-size:7px; }
+  .header { padding:8px 12px 5px; }
+  .header h1 { font-size:14px; }
+}
+@media (max-width:1100px) { .agents-grid { grid-template-columns:repeat(3,1fr); } }
 </style>
 </head>
 <body>
@@ -270,30 +319,23 @@ function createCards() {
         <div class="agent-task" id="task-${agent.id}"></div>
       </div>
     `;
-    // 3D TILT
-    card.addEventListener('mousemove', e => {
-      const r = card.getBoundingClientRect();
-      const x = (e.clientX-r.left)/r.width-0.5;
-      const y = (e.clientY-r.top)/r.height-0.5;
-      card.style.transform = `perspective(800px) rotateX(${-y*12}deg) rotateY(${x*12}deg)`;
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(800px) rotateX(0) rotateY(0)';
-    });
+    // 3D TILT (solo desktop, no touch)
+    if (!('ontouchstart' in window)) {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX-r.left)/r.width-0.5;
+        const y = (e.clientY-r.top)/r.height-0.5;
+        card.style.transform = `perspective(800px) rotateX(${-y*12}deg) rotateY(${x*12}deg)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(800px) rotateX(0) rotateY(0)';
+      });
+    }
     grid.appendChild(card);
   });
 }
 createCards();
-try {
-  // Activar 3 agentes de demo al cargar
-  setTimeout(() => {
-    try {
-      updateAgent('morpheus','working','analizando el Matrix...','',67);
-      updateAgent('trinity','working','ejecutando plan...','',43);
-      updateAgent('tank','working','procesando assets 3D','',55);
-    } catch(e){console.error('Error activando agentes:',e)}
-  }, 500);
-} catch(e) { console.error('Error creando cards:',e); }
+// Los agentes se actualizan vía pollStatus() con datos reales del monitor
 // Terminal, quotes, etc
 function startTerminal(agentId) {
   const term=document.getElementById('term-'+agentId); if(!term) return;
