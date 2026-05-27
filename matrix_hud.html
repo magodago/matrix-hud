@@ -616,7 +616,8 @@ setInterval(drawNeuralNet,50);
 // ===== CLOCK =====
 function updateClock(){
   const d=new Date();
-  document.getElementById('clock').textContent=d.toLocaleTimeString('es-ES',{hour12:false})+' || '+d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const el=document.getElementById('clock');
+  if(el) el.textContent=d.toLocaleTimeString('es-ES',{hour12:false})+' || '+d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'});
 }
 updateClock(); setInterval(updateClock,1000);
 // ========== AGENTES (ESPAÑOL) ==========
