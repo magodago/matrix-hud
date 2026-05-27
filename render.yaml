@@ -2,9 +2,9 @@ services:
   - type: web
     name: matrix-hud
     env: python
+    plan: free
     buildCommand: ""
-    startCommand: python hud_server.py
-    healthCheckPath: /
+    startCommand: python3 hud_server.py
     envVars:
       - key: PORT
         value: 10000

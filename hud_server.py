@@ -141,22 +141,19 @@ def get_local_ip():
     return ip
 
 if __name__ == '__main__':
-    server = HTTPServer(('0.0.0.0', PORT), Handler)
-    ip = get_local_ip()
+    import sys
+    sys.stdout = sys.stderr  # Render captures stderr
+    
     print(f"\n{'='*50}")
-    print(f"  MATRIX HUD SERVER")
-    print(f"{'='*50}")
-    print(f"  Local:   http://localhost:{PORT}")
-    print(f"  Network: http://{ip}:{PORT}")
-    print('  Update agent status:')
-    print('  curl -X POST http://localhost:%d/update \\' % PORT)
-    print("    -H 'Content-Type: application/json' \\")
-    print("""    -d '{"agent":"trinity","status":"working","task":"codificando..."}'""")
+    print(f"  MATRIX HUD SERVER STARTING")
+    print(f"  PORT: {PORT}")
+    print(f"  HUD_FILE: {HUD_FILE}")
+    print(f"  STATUS_FILE: {STATUS_FILE}")
+    print(f"  Files exist: HUD={os.path.exists(HUD_FILE)}, photos_dir={os.path.isdir(os.path.join(BASE, 'agent-photos'))}")
     print(f"{'='*50}\n")
+    sys.stdout.flush()
     
-    # Auto-open browser
-    try:
-        webbrowser.open(f'http://localhost:{PORT}')
-    except: pass
-    
+    server = HTTPServer(('0.0.0.0', PORT), Handler)
+    print(f"SERVER READY on port {PORT}")
+    sys.stdout.flush()
     server.serve_forever()
