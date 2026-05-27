@@ -9,17 +9,18 @@
   "worst_trade": 0,
   "total_fees": 0.0,
   "total_pnl": 0.0,
-  "started_at": "2026-05-27T18:16:56.980150+00:00",
-  "cycle": 33,
-  "last_price": 74852.22,
-  "price_change_24h": 0.18,
-  "signal": "WAIT",
-  "rsi": 50,
-  "ema_fast": 0,
-  "ema_slow": 0,
+  "started_at": "2026-05-27T18:15:39.126084+00:00",
+  "cycle": 59,
+  "last_price": 74912.4,
+  "price_change_24h": 0.23,
+  "signal": "SHORT",
+  "rsi": 69.2,
+  "ema_fast": 74883.67,
+  "ema_slow": 74850.67,
   "status": "running",
   "mode": "scalping_v4_true",
   "close_prices": [
+    74734.0,
     74732.0,
     74808.89,
     74814.68,
@@ -28,7 +29,12 @@
     74810.0,
     74866.37,
     74840.0,
-    74866.3
+    74866.3,
+    74877.86,
+    74895.46,
+    74896.77,
+    74866.86,
+    74903.5
   ],
   "all_prices": [],
   "cfg": {
@@ -68,9 +74,10 @@
     "adjustments": [],
     "hourly_pnl": 0.0,
     "hour_trades": 0,
-    "last_hour_reset": "2026-05-27T18:16:56.980123+00:00"
+    "last_hour_reset": "2026-05-27T18:15:39.126060+00:00"
   },
   "last_signal_ts": 0,
   "cooloff_until": 0,
-  "last_updated": "2026-05-27T18:25:18.469824+00:00"
+  "last_updated": "2026-05-27T18:30:34.127391+00:00",
+  "prev_ema_fast": 74883.67059483347
 }
