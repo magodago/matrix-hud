@@ -278,6 +278,7 @@ let statuses = {};
 let termIntervals = {};
 let quoteIntervals = {};
 let progressIntervals = {};
+let lastServerState = {}; // Para evitar re-aplicar datos del servidor
 agents.forEach(a => { a.progress = 0; statuses[a.id] = { status:'idle', task:'', subtitle:'', progress:0 }; });
 function createCards() {
   const grid = document.getElementById('agents-grid');
@@ -348,13 +349,114 @@ function startTerminal(agentId) {
 function stopTerminal(agentId){if(termIntervals[agentId]){clearInterval(termIntervals[agentId]);delete termIntervals[agentId];}const term=document.getElementById('term-'+agentId);if(term) term.innerHTML='<div class="term-output">⏣ idle</div>';}
 function startQuotes(agentId){const el=document.getElementById('quote-'+agentId);if(!el)return;const agent=agents.find(a=>a.id===agentId);if(!agent)return;if(quoteIntervals[agentId])clearInterval(quoteIntervals[agentId]);let idx=Math.floor(Math.random()*agent.quotes.length);el.textContent=agent.quotes[idx];quoteIntervals[agentId]=setInterval(()=>{idx=(idx+1)%agent.quotes.length;el.textContent=agent.quotes[idx];},4000);}
 function stopQuotes(agentId){if(quoteIntervals[agentId]){clearInterval(quoteIntervals[agentId]);delete quoteIntervals[agentId];}const el=document.getElementById('quote-'+agentId);if(el&&statuses[agentId]&&statuses[agentId].status==='idle')el.textContent='⏣ esperando ordenes...';}
-function animateProgress(element,target){if(!element)return;const current=parseInt(element.textContent)||0;if(current===target)return;const diff=target-current,steps=Math.min(Math.abs(diff),30),stepSize=diff/steps;let step=0;if(progressIntervals[element.id])clearInterval(progressIntervals[element.id]);progressIntervals[element.id]=setInterval(()=>{step++;const val=Math.round(current+stepSize*step);element.textContent=Math.min(100,Math.max(0,val))+'%';element.style.opacity=val>0?'1':'0.3';if(step>=steps){clearInterval(progressIntervals[element.id]);delete progressIntervals[element.id];element.textContent=target+'%';element.style.opacity=target>0?'1':'0.3';}},30);}
-function updateAgent(agentId,newStatus,task='',subtitle='',progress){const card=document.getElementById('card-'+agentId);const statusEl=document.getElementById('status-'+agentId);const taskEl=document.getElementById('task-'+agentId);const quoteEl=document.getElementById('quote-'+agentId);const progressEl=document.getElementById('progress-'+agentId);if(!card)return;card.classList.remove('idle','active','done');statuses[agentId]={status:newStatus,task,subtitle,progress:progress||0};if(progressEl)animateProgress(progressEl,Math.min(100,Math.max(0,progress||0)));switch(newStatus){case'idle':card.classList.add('idle');statusEl.className='agent-status status-idle';statusEl.textContent='⏹';taskEl.textContent='';stopTerminal(agentId);stopQuotes(agentId);if(quoteEl)quoteEl.textContent='⏣ esperando ordenes...';break;case'working':card.classList.add('active');statusEl.className='agent-status status-working';statusEl.textContent='▶';taskEl.textContent=task;const sw=card.querySelector('.shockwave');if(sw){sw.style.animation='none';void sw.offsetWidth;sw.style.animation='';}generateParticles(agentId);startTerminal(agentId);startQuotes(agentId);updateLog(agentId,task);break;case'done':card.classList.add('done');statusEl.className='agent-status status-done';statusEl.textContent='✓';taskEl.textContent=task;stopTerminal(agentId);stopQuotes(agentId);if(quoteEl)quoteEl.textContent='✓ tarea completada';const term=document.getElementById('term-'+agentId);if(term)term.innerHTML='<div class="term-output">✓ completo</div>';setTimeout(()=>updateAgent(agentId,'idle'),5000);break;}updateActiveCount();}
+function animateProgress(element, target) {
+  if (!element) return;
+  const current = parseInt(element.textContent) || 0;
+  if (current === target) return; // No animar si ya está en el valor
+  // Animación suave: 10 pasos a 100ms = 1 segundo
+  const diff = target - current;
+  const steps = Math.min(Math.abs(diff), 10);
+  const stepSize = diff / steps;
+  let step = 0;
+  if (progressIntervals[element.id]) clearInterval(progressIntervals[element.id]);
+  progressIntervals[element.id] = setInterval(() => {
+    step++;
+    const val = Math.round(current + stepSize * step);
+    element.textContent = Math.min(100, Math.max(0, val)) + '%';
+    if (step >= steps) {
+      clearInterval(progressIntervals[element.id]);
+      delete progressIntervals[element.id];
+      element.textContent = target + '%';
+    }
+  }, 100);
+}
+function updateAgent(agentId, newStatus, task, subtitle, progress, fromServer) {
+  // fromServer=true → no auto-idle, no reiniciar animación si el estado no cambió
+  const card = document.getElementById('card-' + agentId);
+  const statusEl = document.getElementById('status-' + agentId);
+  const taskEl = document.getElementById('task-' + agentId);
+  const quoteEl = document.getElementById('quote-' + agentId);
+  const progressEl = document.getElementById('progress-' + agentId);
+  if (!card) return;
+  
+  card.classList.remove('idle', 'active', 'done');
+  statuses[agentId] = { status: newStatus, task, subtitle, progress: progress || 0 };
+  
+  const pct = Math.min(100, Math.max(0, progress || 0));
+  // Cambiar indicador: 🟢 trabajando ⚪ idle 🟡 completado
+  switch (newStatus) {
+    case 'idle':
+      card.classList.add('idle');
+      statusEl.className = 'agent-status status-idle';
+      statusEl.innerHTML = '●';
+      statusEl.style.color = '#666';
+      taskEl.textContent = '';
+      stopTerminal(agentId);
+      stopQuotes(agentId);
+      if (quoteEl) quoteEl.textContent = '⏣ esperando ordenes...';
+      if (progressEl) {
+        progressEl.textContent = '0%';
+        progressEl.style.opacity = '0.3';
+      }
+      break;
+    case 'working':
+      card.classList.add('active');
+      statusEl.className = 'agent-status status-working';
+      statusEl.innerHTML = '●';
+      statusEl.style.color = '#00ff88';
+      statusEl.style.textShadow = '0 0 8px #00ff88';
+      taskEl.textContent = task || '';
+      const sw = card.querySelector('.shockwave');
+      if (sw) { sw.style.animation = 'none'; void sw.offsetWidth; sw.style.animation = ''; }
+      generateParticles(agentId);
+      startTerminal(agentId);
+      startQuotes(agentId);
+      updateLog(agentId, task || '');
+      if (progressEl) animateProgress(progressEl, pct);
+      break;
+    case 'done':
+      card.classList.add('done');
+      statusEl.className = 'agent-status status-done';
+      statusEl.innerHTML = '●';
+      statusEl.style.color = '#ffd700';
+      statusEl.style.textShadow = '0 0 8px #ffd700';
+      taskEl.textContent = task || '✓ completado';
+      stopTerminal(agentId);
+      stopQuotes(agentId);
+      if (quoteEl) quoteEl.textContent = '✓ ' + (task || 'tarea completada');
+      const term = document.getElementById('term-' + agentId);
+      if (term) term.innerHTML = '<div class="term-output">✓ completo</div>';
+      if (progressEl) {
+        progressEl.textContent = pct + '%';
+        progressEl.style.opacity = '1';
+      }
+      // Solo auto-idle si NO viene del servidor (para no competir con pollStatus)
+      if (!fromServer) setTimeout(() => updateAgent(agentId, 'idle', '', '', 0), 5000);
+      break;
+  }
+  updateActiveCount();
+}
 function generateParticles(agentId){const c=document.getElementById('particles-'+agentId);if(!c)return;c.innerHTML='';for(let i=0;i<6;i++){const p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDelay=Math.random()*3+'s';p.style.background=['#d4af37','#ffd700','#fff'][Math.floor(Math.random()*3)];c.appendChild(p);}}
 function updateActiveCount(){document.getElementById('active-count').textContent=Object.values(statuses).filter(s=>s.status==='working').length+' ACTIVE';}
 function updateLog(agentId,task){const a=agents.find(x=>x.id===agentId);document.getElementById('log-text').textContent=`[${new Date().toLocaleTimeString()}] ${a.emoji} ${a.name} → ${task}`;}
-// Poll
-async function pollStatus(){try{const r=await fetch('/status');if(!r.ok)return;const d=await r.json();if(Array.isArray(d))d.forEach(u=>{if(u.agent&&u.status)updateAgent(u.agent,u.status,u.task||'', '', u.progress||0);});document.getElementById('connection-status').textContent='ONLINE';}catch(e){}}
+// Poll — evitar re-animaciones comparando con último estado
+async function pollStatus() {
+  try {
+    const r = await fetch('/status');
+    if (!r.ok) return;
+    const d = await r.json();
+    if (Array.isArray(d)) d.forEach(u => {
+      if (!u.agent || !u.status) return;
+      // Comparar con último estado del servidor para evitar re-aplicar
+      const key = u.agent;
+      const prev = lastServerState[key];
+      if (prev && prev.status === u.status && prev.progress === u.progress && prev.task === u.task) return;
+      lastServerState[key] = { status: u.status, progress: u.progress, task: u.task };
+      updateAgent(u.agent, u.status, u.task || '', '', u.progress || 0, true);
+    });
+    document.getElementById('connection-status').textContent = 'ONLINE';
+  } catch(e) {}
+}
 setInterval(pollStatus,2000);
 window.addEventListener('resize', ()=>{rainCanvas.width=window.innerWidth;rainCanvas.height=window.innerHeight;nCanvas.width=window.innerWidth;nCanvas.height=window.innerHeight;});
 window.matrixHUD = { updateAgent, agents };
