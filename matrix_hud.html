@@ -817,19 +817,6 @@ setInterval(() => {
     }
   });
 }, 1000);
-// LLAMADA DIRECTA: crear mapa ahora (no solo en el parche)
-setTimeout(createOfficeMap, 100);
-
-// Monitoreo de estado para mapa
-setInterval(() => {
-  if (document.getElementById('office-map').style.display === 'none') return;
-  // Actualizar tareas en escritorios desde statuses
-  agents.forEach(a => {
-    const s = statuses[a.id];
-    if (s) updateDesk(a.id, s.status, s.task || '');
-  });
-}, 1000);
-
 // Los agentes se actualizan vía pollStatus() con datos reales del monitor
 // Terminal, quotes, etc
 function startTerminal(agentId) {
