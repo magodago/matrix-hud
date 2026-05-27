@@ -612,10 +612,20 @@ function getBreakXY(idx) {
   }
 }
 
-function posToPixels(px, py) {
+function getMapDims() {
   const map = document.getElementById('office-map');
-  if (!map) return { x: 0, y: 0 };
-  return { x: map.offsetWidth * px / 100, y: map.offsetHeight * py / 100 };
+  if (!map) return { w: 640, h: 480 };
+  const w = map.offsetWidth;
+  if (w > 0) return { w, h: map.offsetHeight };
+  // Fallback: estimar con getBoundingClientRect o ratio 4:3
+  const r = map.getBoundingClientRect();
+  if (r.width > 0) return { w: r.width, h: r.height };
+  const vw = window.innerWidth;
+  return { w: Math.min(vw * 0.95, 700), h: Math.min(vw * 0.95 * 0.75, 400) };
+}
+function posToPixels(px, py) {
+  const d = getMapDims();
+  return { x: d.w * px / 100, y: d.h * py / 100 };
 }
 
 // Crear sprites de agentes
@@ -732,31 +742,60 @@ function animateToBreak(agentId) {
 }
 
 // ===== ACTUALIZAR SPRITE =====
-function updateAgentSprite(agentId, newStatus, task) {
+function placeSpriteAt(agentId, px, py, cls) {
   const se = spriteElements[agentId];
   if (!se) return;
   const { el, tag } = se;
+  const d = getMapDims();
+  const lx = px / 100 * d.w;
+  const ly = py / 100 * d.h;
+  el.classList.remove('idle', 'walking', 'working', 'done');
+  if (cls) el.classList.add(cls);
+  el.style.left = lx + 'px';
+  el.style.top = ly + 'px';
+  tag.style.left = lx + 'px';
+  tag.style.top = (ly + 20) + 'px';
+}
+function updateAgentSprite(agentId, newStatus, task) {
+  const se = spriteElements[agentId];
+  if (!se) return;
+  const { el, tag, idx } = se;
   const prev = agentStates[agentId];
   if (prev === newStatus) return;
-  
   agentStates[agentId] = newStatus;
-  
+
+  const map = document.getElementById('office-map');
+  const mapVisible = map && map.style.display !== 'none' && map.offsetWidth > 0;
+
   if (newStatus === 'working' && prev === 'idle') {
-    // De descanso → a trabajar: caminar al puesto
-    animateToDesk(agentId);
+    if (mapVisible) {
+      // ANIMADO: descanso → pasillo → puesto
+      animateToDesk(agentId);
+    } else {
+      // DIRECTO: poner en el puesto sin animación
+      const desk = getDeskXY(idx);
+      placeSpriteAt(agentId, desk.x, desk.y, 'working');
+    }
   } else if (newStatus === 'idle' && (prev === 'working' || prev === 'done')) {
-    // De trabajo → descanso: volver
-    animateToBreak(agentId);
+    if (mapVisible) {
+      animateToBreak(agentId);
+    } else {
+      const bp = getBreakXY(idx);
+      placeSpriteAt(agentId, bp.x, bp.y, 'idle');
+    }
   } else if (newStatus === 'done') {
-    el.classList.remove('idle', 'walking', 'working');
-    el.classList.add('done');
+    const desk = getDeskXY(idx);
+    placeSpriteAt(agentId, desk.x, desk.y, 'done');
   } else if (newStatus === 'working') {
-    el.classList.remove('idle', 'walking', 'done');
-    el.classList.add('working');
+    const desk = getDeskXY(idx);
+    placeSpriteAt(agentId, desk.x, desk.y, 'working');
   } else if (newStatus === 'idle') {
-    el.classList.remove('working', 'done', 'walking');
-    el.classList.add('idle');
-    if (!el._targetX) placeAgentInBreak(agentId, true);
+    if (el._targetX) {
+      // Ya tenía posición
+    } else {
+      const bp = getBreakXY(idx);
+      placeSpriteAt(agentId, bp.x, bp.y, 'idle');
+    }
   }
 }
 
@@ -789,6 +828,17 @@ function switchView(view) {
     btnGrid.classList.remove('active');
     btnMap.classList.add('active');
     createAgentSprites();
+    // Sincronizar sprites con estado actual inmediatamente
+    agents.forEach(agent => {
+      const a = lastServerState[agent.id];
+      if (a && a.status !== 'idle') {
+        // Si no está idle, colocar en su puesto directamente
+        const idx = agents.indexOf(agent);
+        const desk = getDeskXY(idx);
+        placeSpriteAt(agent.id, desk.x, desk.y, a.status === 'done' ? 'done' : 'working');
+        agentStates[agent.id] = a.status;
+      }
+    });
   }
 }
 
