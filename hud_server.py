@@ -8,9 +8,10 @@ import webbrowser
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
-HUD_FILE = os.path.join(os.path.dirname(__file__), 'matrix_hud.html')
-STATUS_FILE = os.path.join(os.path.dirname(__file__), 'agent_status.json')
-PORT = 3333
+BASE = os.path.dirname(os.path.abspath(__file__))
+HUD_FILE = os.path.join(BASE, 'matrix_hud.html')
+STATUS_FILE = os.path.join(BASE, 'agent_status.json')
+PORT = int(os.environ.get('PORT', 3333))
 
 # Initial status
 initial_status = [
@@ -46,7 +47,7 @@ class Handler(BaseHTTPRequestHandler):
         elif path.startswith('/agent-photos/'):
             # Serve agent photos
             filename = os.path.basename(path)
-            photo_dir = os.path.join(os.path.dirname(__file__), 'agent-photos')
+            photo_dir = os.path.join(BASE, 'agent-photos')
             photo_path = os.path.join(photo_dir, filename)
             if os.path.exists(photo_path):
                 ext = filename.rsplit('.', 1)[-1].lower()
