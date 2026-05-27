@@ -3,7 +3,7 @@
   "portfolio_value": 97.34,
   "positions": [
     {
-      "ts": "2026-05-27T19:45:38.727371+00:00",
+      "ts": "2026-05-27T19:50:52.413523+00:00",
       "market": "Will the San Antonio Spurs win the 2026 NBA Finals?",
       "slug": "will-the-san-antonio-spurs-win-the-2026-nba-finals",
       "type": "BUY_YES",
@@ -22,7 +22,7 @@
       "cp": 14.9
     },
     {
-      "ts": "2026-05-27T19:45:38.727411+00:00",
+      "ts": "2026-05-27T19:50:52.413559+00:00",
       "market": "Will Portugal win the 2026 FIFA World Cup?",
       "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
       "type": "BUY_YES",
@@ -41,7 +41,7 @@
       "cp": 10.5
     },
     {
-      "ts": "2026-05-27T19:45:38.727420+00:00",
+      "ts": "2026-05-27T19:50:52.413568+00:00",
       "market": "Will Netherlands win the 2026 FIFA World Cup?",
       "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
       "type": "BUY_YES",
@@ -62,7 +62,7 @@
   ],
   "trade_history": [
     {
-      "ts": "2026-05-27T19:45:38.727371+00:00",
+      "ts": "2026-05-27T19:50:52.413523+00:00",
       "market": "Will the San Antonio Spurs win the 2026 NBA Finals?",
       "slug": "will-the-san-antonio-spurs-win-the-2026-nba-finals",
       "type": "BUY_YES",
@@ -81,7 +81,7 @@
       "cp": 14.9
     },
     {
-      "ts": "2026-05-27T19:45:38.727411+00:00",
+      "ts": "2026-05-27T19:50:52.413559+00:00",
       "market": "Will Portugal win the 2026 FIFA World Cup?",
       "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
       "type": "BUY_YES",
@@ -100,7 +100,7 @@
       "cp": 10.5
     },
     {
-      "ts": "2026-05-27T19:45:38.727420+00:00",
+      "ts": "2026-05-27T19:50:52.413568+00:00",
       "market": "Will Netherlands win the 2026 FIFA World Cup?",
       "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
       "type": "BUY_YES",
@@ -125,17 +125,19 @@
   "worst_trade": 0,
   "total_fees": 2.6606,
   "total_pnl": -2.66,
-  "started_at": "2026-05-27T19:37:15.623987+00:00",
-  "cycle": 34,
-  "last_price": 75004.49,
+  "started_at": "2026-05-27T19:35:23.169796+00:00",
+  "cycle": 62,
+  "last_price": 74998.85,
   "price_change_24h": -0.08,
-  "signal": "WAIT",
-  "rsi": 50,
-  "ema_fast": 0,
-  "ema_slow": 0,
+  "signal": "SHORT",
+  "rsi": 44.6,
+  "ema_fast": 74998.92,
+  "ema_slow": 75010.74,
   "status": "running",
   "mode": "v4.6_research",
   "close_prices": [
+    75031.43,
+    75020.68,
     75069.29,
     75050.0,
     75054.01,
@@ -143,7 +145,12 @@
     75041.6,
     74986.67,
     74995.52,
-    75012.27
+    75012.27,
+    74985.82,
+    74992.01,
+    75021.1,
+    75023.7,
+    74971.21
   ],
   "all_prices": [],
   "cfg": {
@@ -183,11 +190,12 @@
     "adjustments": [],
     "hourly_pnl": 0.0,
     "hour_trades": 0,
-    "last_hour_reset": "2026-05-27T19:37:15.623948+00:00"
+    "last_hour_reset": "2026-05-27T19:35:23.169767+00:00"
   },
   "last_signal_ts": 0,
   "cooloff_until": 0,
-  "last_updated": "2026-05-27T19:45:38.727443+00:00",
+  "last_updated": "2026-05-27T19:50:52.413589+00:00",
+  "prev_ema_fast": 74998.91709894629,
   "total_gas": 1.5,
   "markets_scanned": 885,
   "opportunities": [
