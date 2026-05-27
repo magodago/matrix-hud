@@ -1,206 +1,265 @@
 {
-  "capital": 6590.82,
-  "portfolio_value": 6590.82,
-  "total_pnl": 0.0,
-  "total_trades": 5,
-  "winning_trades": 0,
+  "capital": 11.60290625,
+  "portfolio_value": 96.09,
   "positions": [
     {
-      "timestamp": "2026-05-27T16:52:12.406550",
-      "market": "Will Germany win the 2026 FIFA World Cup?",
-      "slug": "will-germany-win-the-2026-fifa-world-cup-467",
+      "ts": "2026-05-27T15:03:22.218288+00:00",
+      "market": "Will Portugal win the 2026 FIFA World Cup?",
+      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
       "type": "BUY_YES",
-      "entry": 5.1,
-      "shares": 15686.27,
-      "size": 800.0,
-      "score": 65.7,
+      "entry": 10.5,
+      "shares": 323.24,
+      "size": 33.94,
+      "gross": 35.0,
+      "fees": {
+        "total": 1.06,
+        "gas": 0.5
+      },
+      "score": 96.7,
+      "conf": "high",
       "status": "open",
-      "pnl": 0
+      "pnl": -0.41,
+      "cp": 10.5,
+      "pnl_pct": 0.5
     },
     {
-      "timestamp": "2026-05-27T16:52:12.406587",
-      "market": "Will Alexandria Ocasio-Cortez win the 2028 US Presidential E",
-      "slug": "will-alexandria-ocasio-cortez-win-the-2028-us-presidential-election",
+      "ts": "2026-05-27T15:03:22.218322+00:00",
+      "market": "Will Netherlands win the 2026 FIFA World Cup?",
+      "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
       "type": "BUY_YES",
-      "entry": 5.1,
-      "shares": 14431.37,
-      "size": 736.0,
-      "score": 65.1,
+      "entry": 3.9,
+      "shares": 561.18,
+      "size": 21.89,
+      "gross": 22.75,
+      "fees": {
+        "total": 0.864,
+        "gas": 0.5
+      },
+      "score": 96.6,
+      "conf": "high",
       "status": "open",
-      "pnl": 0
+      "pnl": -0.82,
+      "cp": 3.9,
+      "pnl_pct": -1.3
     },
     {
-      "timestamp": "2026-05-27T16:52:12.406603",
-      "market": "Will Jon Ossoff win the 2028 Democratic presidential nominat",
-      "slug": "will-jon-ossoff-win-the-2028-democratic-presidential-nomination-885",
+      "ts": "2026-05-27T15:03:22.218331+00:00",
+      "market": "Will Brazil win the 2026 FIFA World Cup?",
+      "slug": "will-brazil-win-the-2026-fifa-world-cup-183",
       "type": "BUY_YES",
-      "entry": 5.5,
-      "shares": 12311.27,
-      "size": 677.12,
-      "score": 64.9,
+      "entry": 9.3,
+      "shares": 151.08,
+      "size": 14.05,
+      "gross": 14.79,
+      "fees": {
+        "total": 0.7366,
+        "gas": 0.5
+      },
+      "score": 96.5,
+      "conf": "high",
       "status": "open",
-      "pnl": 0
+      "pnl": -0.45,
+      "cp": 9.3,
+      "pnl_pct": 0.5
     },
     {
-      "timestamp": "2026-05-27T16:52:12.406608",
-      "market": "Will Josh Shapiro win the 2028 Democratic presidential nomin",
-      "slug": "will-josh-shapiro-win-the-2028-democratic-presidential-nomination-977",
+      "ts": "2026-05-27T15:06:08.058555+00:00",
+      "market": "Will Portugal win the 2026 FIFA World Cup?",
+      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
       "type": "BUY_YES",
-      "entry": 5.5,
-      "shares": 11326.37,
-      "size": 622.95,
-      "score": 64.6,
+      "entry": 10.5,
+      "shares": 85.32,
+      "size": 8.96,
+      "gross": 9.61,
+      "fees": {
+        "total": 0.6538,
+        "gas": 0.5
+      },
+      "score": 96.7,
+      "conf": "high",
       "status": "open",
-      "pnl": 0
+      "pnl": 0,
+      "cp": 10.5
     },
     {
-      "timestamp": "2026-05-27T16:52:12.406612",
-      "market": "Will Tucker Carlson win the 2028 Republican presidential nom",
-      "slug": "will-tucker-carlson-win-the-2028-republican-presidential-nomination",
+      "ts": "2026-05-27T15:06:08.058585+00:00",
+      "market": "Will Netherlands win the 2026 FIFA World Cup?",
+      "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
       "type": "BUY_YES",
-      "entry": 5.9,
-      "shares": 9713.8,
-      "size": 573.11,
-      "score": 64.6,
+      "entry": 3.9,
+      "shares": 144.81,
+      "size": 5.65,
+      "gross": 6.25,
+      "fees": {
+        "total": 0.6,
+        "gas": 0.5
+      },
+      "score": 96.6,
+      "conf": "high",
       "status": "open",
-      "pnl": 0
+      "pnl": 0,
+      "cp": 3.9
     }
   ],
   "trade_history": [
     {
-      "timestamp": "2026-05-27T16:52:12.406550",
-      "market": "Will Germany win the 2026 FIFA World Cup?",
-      "slug": "will-germany-win-the-2026-fifa-world-cup-467",
+      "ts": "2026-05-27T15:03:22.218288+00:00",
+      "market": "Will Portugal win the 2026 FIFA World Cup?",
+      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
       "type": "BUY_YES",
-      "entry": 5.1,
-      "shares": 15686.27,
-      "size": 800.0,
-      "score": 65.7,
+      "entry": 10.5,
+      "shares": 323.24,
+      "size": 33.94,
+      "gross": 35.0,
+      "fees": {
+        "total": 1.06,
+        "gas": 0.5
+      },
+      "score": 96.7,
+      "conf": "high",
       "status": "open",
-      "pnl": 0
+      "pnl": 0,
+      "cp": 10.5
     },
     {
-      "timestamp": "2026-05-27T16:52:12.406587",
-      "market": "Will Alexandria Ocasio-Cortez win the 2028 US Presidential E",
-      "slug": "will-alexandria-ocasio-cortez-win-the-2028-us-presidential-election",
+      "ts": "2026-05-27T15:03:22.218322+00:00",
+      "market": "Will Netherlands win the 2026 FIFA World Cup?",
+      "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
       "type": "BUY_YES",
-      "entry": 5.1,
-      "shares": 14431.37,
-      "size": 736.0,
-      "score": 65.1,
+      "entry": 3.9,
+      "shares": 561.18,
+      "size": 21.89,
+      "gross": 22.75,
+      "fees": {
+        "total": 0.864,
+        "gas": 0.5
+      },
+      "score": 96.6,
+      "conf": "high",
       "status": "open",
-      "pnl": 0
+      "pnl": 0,
+      "cp": 3.9
     },
     {
-      "timestamp": "2026-05-27T16:52:12.406603",
-      "market": "Will Jon Ossoff win the 2028 Democratic presidential nominat",
-      "slug": "will-jon-ossoff-win-the-2028-democratic-presidential-nomination-885",
+      "ts": "2026-05-27T15:03:22.218331+00:00",
+      "market": "Will Brazil win the 2026 FIFA World Cup?",
+      "slug": "will-brazil-win-the-2026-fifa-world-cup-183",
       "type": "BUY_YES",
-      "entry": 5.5,
-      "shares": 12311.27,
-      "size": 677.12,
-      "score": 64.9,
+      "entry": 9.3,
+      "shares": 151.08,
+      "size": 14.05,
+      "gross": 14.79,
+      "fees": {
+        "total": 0.7366,
+        "gas": 0.5
+      },
+      "score": 96.5,
+      "conf": "high",
       "status": "open",
-      "pnl": 0
+      "pnl": 0,
+      "cp": 9.3
     },
     {
-      "timestamp": "2026-05-27T16:52:12.406608",
-      "market": "Will Josh Shapiro win the 2028 Democratic presidential nomin",
-      "slug": "will-josh-shapiro-win-the-2028-democratic-presidential-nomination-977",
+      "ts": "2026-05-27T15:06:08.058555+00:00",
+      "market": "Will Portugal win the 2026 FIFA World Cup?",
+      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
       "type": "BUY_YES",
-      "entry": 5.5,
-      "shares": 11326.37,
-      "size": 622.95,
-      "score": 64.6,
+      "entry": 10.5,
+      "shares": 85.32,
+      "size": 8.96,
+      "gross": 9.61,
+      "fees": {
+        "total": 0.6538,
+        "gas": 0.5
+      },
+      "score": 96.7,
+      "conf": "high",
       "status": "open",
-      "pnl": 0
+      "pnl": 0,
+      "cp": 10.5
     },
     {
-      "timestamp": "2026-05-27T16:52:12.406612",
-      "market": "Will Tucker Carlson win the 2028 Republican presidential nom",
-      "slug": "will-tucker-carlson-win-the-2028-republican-presidential-nomination",
+      "ts": "2026-05-27T15:06:08.058585+00:00",
+      "market": "Will Netherlands win the 2026 FIFA World Cup?",
+      "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
       "type": "BUY_YES",
-      "entry": 5.9,
-      "shares": 9713.8,
-      "size": 573.11,
-      "score": 64.6,
+      "entry": 3.9,
+      "shares": 144.81,
+      "size": 5.65,
+      "gross": 6.25,
+      "fees": {
+        "total": 0.6,
+        "gas": 0.5
+      },
+      "score": 96.6,
+      "conf": "high",
       "status": "open",
-      "pnl": 0
+      "pnl": 0,
+      "cp": 3.9
     }
   ],
-  "signals": [
+  "total_trades": 5,
+  "winning_trades": 0,
+  "total_pnl": -3.91,
+  "total_fees": 3.9143535,
+  "total_gas": 2.5,
+  "best_trade": 0,
+  "worst_trade": 0,
+  "started_at": "2026-05-27T15:03:22.033915+00:00",
+  "cycle": 2,
+  "markets_scanned": 885,
+  "opportunities": [
     {
-      "q": "Will Germany win the 2026 FIFA World Cup?",
-      "slug": "will-germany-win-the-2026-fifa-world-cup-467",
-      "yes": 5.1,
-      "vol": 20392930.19940475,
-      "score": 65.7
+      "q": "Will Portugal win the 2026 FIFA World Cup?",
+      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
+      "yp": 10.5,
+      "sp": 0.1,
+      "vol": 24557882.186961643,
+      "score": 96.7,
+      "rec": "BUY_YES",
+      "conf": "high"
     },
     {
-      "q": "Will Alexandria Ocasio-Cortez win the 2028 US Presidential E",
-      "slug": "will-alexandria-ocasio-cortez-win-the-2028-us-presidential-election",
-      "yes": 5.1,
-      "vol": 11560466.260531802,
-      "score": 65.1
-    },
-    {
-      "q": "Will Jon Ossoff win the 2028 Democratic presidential nominat",
-      "slug": "will-jon-ossoff-win-the-2028-democratic-presidential-nomination-885",
-      "yes": 5.5,
-      "vol": 11239972.28108787,
-      "score": 64.9
-    },
-    {
-      "q": "Will Josh Shapiro win the 2028 Democratic presidential nomin",
-      "slug": "will-josh-shapiro-win-the-2028-democratic-presidential-nomination-977",
-      "yes": 5.5,
-      "vol": 8388468.247820211,
-      "score": 64.6
-    },
-    {
-      "q": "Will Tucker Carlson win the 2028 Republican presidential nom",
-      "slug": "will-tucker-carlson-win-the-2028-republican-presidential-nomination",
-      "yes": 5.9,
-      "vol": 11173273.788495965,
-      "score": 64.6
-    },
-    {
-      "q": "Will Argentina win the 2026 FIFA World Cup?",
-      "slug": "will-argentina-win-the-2026-fifa-world-cup-245",
-      "yes": 8.3,
-      "vol": 21924259.037901003,
-      "score": 64.2
-    },
-    {
-      "q": "Will Kamala Harris win the 2028 US Presidential Election?",
-      "slug": "will-kamala-harris-win-the-2028-us-presidential-election",
-      "yes": 6.2,
-      "vol": 7663155.9206899945,
-      "score": 64.1
-    },
-    {
-      "q": "Netanyahu out by June 30?",
-      "slug": "netanyahu-out-by-june-30-383-244-575",
-      "yes": 6.0,
-      "vol": 5341758.868637957,
-      "score": 63.8
+      "q": "Will Netherlands win the 2026 FIFA World Cup?",
+      "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
+      "yp": 3.9,
+      "sp": 0.1,
+      "vol": 23640297.52357247,
+      "score": 96.6,
+      "rec": "BUY_YES",
+      "conf": "high"
     },
     {
       "q": "Will Brazil win the 2026 FIFA World Cup?",
       "slug": "will-brazil-win-the-2026-fifa-world-cup-183",
-      "yes": 9.3,
-      "vol": 22314329.16668103,
-      "score": 63.7
+      "yp": 9.3,
+      "sp": 0.1,
+      "vol": 22314440.54965803,
+      "score": 96.5,
+      "rec": "BUY_YES",
+      "conf": "high"
     },
     {
-      "q": "Will Kamala Harris win the 2028 Democratic presidential nomi",
-      "slug": "will-kamala-harris-win-the-2028-democratic-presidential-nomination-641",
-      "yes": 8.3,
-      "vol": 11732501.240147974,
-      "score": 63.5
+      "q": "Will Argentina win the 2026 FIFA World Cup?",
+      "slug": "will-argentina-win-the-2026-fifa-world-cup-245",
+      "yp": 8.3,
+      "sp": 0.1,
+      "vol": 21934348.207901005,
+      "score": 96.5,
+      "rec": "BUY_YES",
+      "conf": "high"
+    },
+    {
+      "q": "Will Germany win the 2026 FIFA World Cup?",
+      "slug": "will-germany-win-the-2026-fifa-world-cup-467",
+      "yp": 5.1,
+      "sp": 0.1,
+      "vol": 20394083.119404748,
+      "score": 96.4,
+      "rec": "BUY_YES",
+      "conf": "high"
     }
   ],
-  "scanned": 643,
-  "timestamp": "2026-05-27T16:52:12.406315",
-  "status": "running"
+  "status": "running",
+  "last_updated": "2026-05-27T15:06:08.058609+00:00"
 }
