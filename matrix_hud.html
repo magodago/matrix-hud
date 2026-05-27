@@ -218,27 +218,6 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
 /* ===== TABLET (901-1100px) ===== */
 @media (min-width:901px) and (max-width:1100px) { .agents-grid { grid-template-columns:repeat(3,1fr); } }
 
-/* ===== OVERLAY COMPLETADO ===== */
-#completion-overlay { 
-  display:none; 
-  position:fixed; 
-  top:0; 
-  left:0; 
-  width:100%; 
-  height:100%; 
-  z-index:999; 
-  background:#000; 
-  cursor:pointer; 
-  -webkit-animation:fadeInOverlay 0.8s ease-out;
-  animation:fadeInOverlay 0.8s ease-out;
-}
-@keyframes fadeInOverlay { 0%{opacity:0} 100%{opacity:1} }
-@-webkit-keyframes fadeInOverlay { 0%{opacity:0} 100%{opacity:1} }
-@media (max-width:600px) {
-  #completion-title { font-size:16vw !important; letter-spacing:4px !important; }
-  #completion-sub { font-size:5vw !important; }
-  #completion-tap { font-size:4vw !important; }
-}
 
 /* ===== MAPA DE OFICINA CYBERPUNK V2 ===== */
 #office-map { display:none; position:relative; z-index:2; width:100%; background:url('/office_bg.png') center/contain no-repeat; overflow:hidden; min-height:300px; max-height:calc(100vh - 110px); aspect-ratio:4/3; margin:0 auto; background-color:#0d0d12; image-rendering:pixelated; }
@@ -350,15 +329,6 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
 <canvas id="neural-canvas"></canvas>
 <canvas id="matrix-rain"></canvas>
 <div class="scanlines"></div>
-<!-- ===== OVERLAY COMPLETADO ===== -->
-<div id="completion-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:999;background:#000;cursor:pointer;">
-  <canvas id="overlay-rain" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0.15;"></canvas>
-  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;width:90%;">
-    <div id="completion-title" style="font-family:'Orbitron',monospace;font-size:8vw;font-weight:900;color:#ffd700;text-shadow:0 0 40px rgba(255,215,0,0.5),0 0 80px rgba(212,175,55,0.3);letter-spacing:8px;opacity:0;transition:opacity 1.5s;">COMPLETADO</div>
-    <div id="completion-sub" style="font-family:'Share Tech Mono',monospace;font-size:2.5vw;color:rgba(212,175,55,0.6);margin-top:30px;opacity:0;transition:opacity 2s 0.5s;">⋮ NEO.DEPT</div>
-    <div id="completion-tap" style="font-family:'Share Tech Mono',monospace;font-size:1.5vw;color:rgba(255,255,255,0.2);margin-top:60px;opacity:0;transition:opacity 2s 2s;">toca la pantalla para continuar</div>
-  </div>
-</div>
 <div class="header">
   <h1>⋮ NEO.DEPT</h1>
   <span id="clock">--:--:--</span>
@@ -827,41 +797,26 @@ function updateAgentSprite(agentId, newStatus, task) {
 
   if (newStatus === 'working' && prev !== 'working') {
     // Cualquier estado → working: caminar de descanso a puesto
-    if (prev === 'done' || prev === 'idle') {
-      // Si venía de done (estaba en el puesto), primero teletransportar a descanso
-      if (prev === 'done') {
-        const bp = getBreakXY(idx);
-        placeSpriteAt(agentId, bp.x, bp.y, 'walking', true); // sin transición
-      }
-      if (mapVisible) {
-        animateToDesk(agentId);
-      } else {
-        const desk = getDeskXY(idx);
-        placeSpriteAt(agentId, desk.x, desk.y, 'working');
-      }
+    if (mapVisible) {
+      animateToDesk(agentId);
     } else {
       const desk = getDeskXY(idx);
       placeSpriteAt(agentId, desk.x, desk.y, 'working');
     }
-  } else if (newStatus === 'idle' && prev !== 'idle') {
-    if (mapVisible) {
-      animateToBreak(agentId);
+  } else if (newStatus === 'idle' || newStatus === 'done') {
+    // idle o done → a la zona de relax
+    if (prev === 'working') {
+      // Venía trabajando → caminar a relax
+      if (mapVisible) {
+        animateToBreak(agentId);
+      } else {
+        const bp = getBreakXY(idx);
+        placeSpriteAt(agentId, bp.x, bp.y, newStatus === 'done' ? 'done' : 'idle');
+      }
     } else {
+      // Ya estaba en relax
       const bp = getBreakXY(idx);
-      placeSpriteAt(agentId, bp.x, bp.y, 'idle');
-    }
-  } else if (newStatus === 'done') {
-    const desk = getDeskXY(idx);
-    placeSpriteAt(agentId, desk.x, desk.y, 'done');
-  } else if (newStatus === 'working') {
-    const desk = getDeskXY(idx);
-    placeSpriteAt(agentId, desk.x, desk.y, 'working');
-  } else if (newStatus === 'idle') {
-    if (el._targetX) {
-      // Ya tenía posición
-    } else {
-      const bp = getBreakXY(idx);
-      placeSpriteAt(agentId, bp.x, bp.y, 'idle');
+      placeSpriteAt(agentId, bp.x, bp.y, newStatus === 'done' ? 'done' : 'idle');
     }
   }
 }
@@ -1044,8 +999,6 @@ async function pollStatus() {
       if (prev && prev.status === u.status && prev.progress === u.progress && prev.task === u.task) return;
       lastServerState[key] = { status: u.status, progress: u.progress, task: u.task };
       updateAgent(u.agent, u.status, u.task || '', '', u.progress || 0, true);
-      // Check overlay from server updates too
-      setTimeout(checkAllDone, 500);
     });
     document.getElementById('connection-status').textContent = 'ONLINE';
   } catch(e) {}
@@ -1053,92 +1006,6 @@ async function pollStatus() {
 setInterval(pollStatus,2000);
 window.addEventListener('resize', ()=>{rainCanvas.width=window.innerWidth;rainCanvas.height=window.innerHeight;nCanvas.width=window.innerWidth;nCanvas.height=window.innerHeight;});
 window.matrixHUD = { updateAgent, agents };
-
-// ===== OVERLAY COMPLETADO =====
-let overlayActive = false;
-let overlayRainInterval = null;
-function showCompletionOverlay() {
-  const overlay = document.getElementById('completion-overlay');
-  if (!overlay || overlayActive) return;
-  overlayActive = true;
-  overlay.style.display = 'block';
-  // Iniciar lluvia en overlay
-  const oc = document.getElementById('overlay-rain');
-  if (oc) {
-    const octx = oc.getContext('2d');
-    oc.width = window.innerWidth;
-    oc.height = window.innerHeight;
-    const ochars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789';
-    const ofont = 16;
-    const ocols = oc.width / ofont;
-    const odrops = Array(Math.floor(ocols)).fill(1);
-    if (overlayRainInterval) clearInterval(overlayRainInterval);
-    overlayRainInterval = setInterval(() => {
-      octx.fillStyle = 'rgba(0,0,0,0.05)';
-      octx.fillRect(0, 0, oc.width, oc.height);
-      octx.font = ofont + 'px monospace';
-      for (let i = 0; i < odrops.length; i++) {
-        octx.fillStyle = Math.random() > 0.98 ? '#ffd700' : '#d4af37';
-        octx.fillText(ochars[Math.floor(Math.random() * ochars.length)], i * ofont, odrops[i] * ofont);
-        if (odrops[i] * ofont > oc.height && Math.random() > 0.975) odrops[i] = 0;
-        odrops[i]++;
-      }
-    }, 50);
-  }
-  // Animar texto
-  setTimeout(() => {
-    document.getElementById('completion-title').style.opacity = '1';
-  }, 200);
-  setTimeout(() => {
-    document.getElementById('completion-sub').style.opacity = '1';
-  }, 700);
-  setTimeout(() => {
-    document.getElementById('completion-tap').style.opacity = '1';
-  }, 2500);
-}
-function hideCompletionOverlay() {
-  const overlay = document.getElementById('completion-overlay');
-  if (!overlay || !overlayActive) return;
-  overlayActive = false;
-  if (overlayRainInterval) { clearInterval(overlayRainInterval); overlayRainInterval = null; }
-  overlay.style.display = 'none';
-  // Resetear opacidades
-  document.getElementById('completion-title').style.opacity = '0';
-  document.getElementById('completion-sub').style.opacity = '0';
-  document.getElementById('completion-tap').style.opacity = '0';
-  // Resetear TODOS los agentes a idle 0%
-  agents.forEach(a => {
-    updateAgent(a.id, 'idle', '', '', 0);
-    lastServerState[a.id] = { status: 'idle', progress: 0, task: '' };
-  });
-  document.getElementById('log-text').textContent = '⏣ sistema reiniciado · esperando ordenes...';
-}
-// Detectar cuando todos los agentes completan
-function checkAllDone() {
-  if (overlayActive) return;
-  const working = Object.values(statuses).filter(s => s.status === 'working').length;
-  if (working === 0) {
-    // Verificar si al menos uno hizo algo (no todos idle)
-    const anyDone = Object.values(statuses).some(s => s.status === 'done');
-    if (anyDone) {
-      setTimeout(showCompletionOverlay, 800);
-    }
-  }
-}
-// Parchar updateAgent para detectar completado
-const _origUpdateAgent = updateAgent;
-updateAgent = function(agentId, newStatus, task, subtitle, progress, fromServer) {
-  _origUpdateAgent(agentId, newStatus, task, subtitle, progress, fromServer);
-  if (newStatus === 'done') {
-    // Chequear si todos terminaron
-    setTimeout(checkAllDone, 100);
-  }
-};
-// Tap en overlay para cerrar
-document.addEventListener('DOMContentLoaded', () => {
-  const overlay = document.getElementById('completion-overlay');
-  if (overlay) overlay.addEventListener('click', hideCompletionOverlay);
-});
 </script>
 </body>
 </html>
