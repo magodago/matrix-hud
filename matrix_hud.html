@@ -104,8 +104,50 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
 .agent-card.active .particles { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; z-index:0; }
 .particle { position:absolute; width:2px; height:2px; border-radius:50%; animation:float-particle 4s infinite; }
 @keyframes float-particle { 0%{transform:translateY(100%) scale(0);opacity:0} 20%{opacity:1} 80%{opacity:1} 100%{transform:translateY(-20px) scale(1);opacity:0} }
-.log-panel { position:fixed; bottom:0; left:0; width:100%; height:26px; background:#000; border-top:1px solid rgba(212,175,55,0.06); z-index:5; display:flex; align-items:center; padding:0 12px; font-size:10px; color:rgba(255,255,255,0.25); }
-.log-text { color:var(--gold); margin-left:4px; overflow:hidden; white-space:nowrap; }
+/* Task terminal (verde fosforito) */
+.task-terminal {
+  display:none;
+  width:calc(100% - 16px);
+  max-width:700px;
+  margin:6px auto 60px;
+  background:#0a0a0a;
+  border:1px solid #00ff41;
+  border-radius:4px;
+  font-family:'Courier New',monospace;
+  font-size:11px;
+  overflow:hidden;
+  box-shadow:0 0 20px rgba(0,255,65,0.08);
+}
+.task-term-header {
+  background:#001a00;
+  color:#00ff41;
+  padding:5px 10px;
+  font-weight:bold;
+  font-size:10px;
+  letter-spacing:1px;
+  border-bottom:1px solid #003300;
+  text-shadow:0 0 8px rgba(0,255,65,0.5);
+}
+.task-term-body {
+  background:#0d0d0d;
+  height:120px;
+  overflow-y:auto;
+  padding:4px 8px;
+  scrollbar-width:thin;
+  scrollbar-color:#003300 transparent;
+}
+.task-term-body::-webkit-scrollbar { width:4px; }
+.task-term-body::-webkit-scrollbar-thumb { background:#003300; border-radius:2px; }
+.task-line {
+  padding:1px 0;
+  line-height:1.4;
+  opacity:0.85;
+  transition:opacity 0.3s;
+}
+.task-line:hover { opacity:1; }
+.task-time { color:#006600; margin-right:4px; }
+.task-agent { color:#00ff41; margin-right:4px; font-weight:bold; }
+.task-msg { color:#ccffcc; }
 @media (min-width:701px) and (max-width:1100px) { .agents-grid { grid-template-columns:repeat(3,1fr); } }
 @media (max-width:700px) { .agents-grid { grid-template-columns:repeat(2,1fr); gap:5px; padding:4px 4px 40px; } }
 /* ===== MÓVIL (iPhone, < 600px) ===== */
@@ -319,11 +361,31 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
   <img src="/office_bg.png" id="office-bg" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;image-rendering:pixelated;z-index:1;">
   <div id="agent-sprites" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;"></div>
 </div>
-<div class="log-panel">
-  <span>⏣ LOG</span>
-  <span class="log-text" id="log-text">Initializing Matrix HUD...</span>
+<!-- ===== TERMINAL DE TAREAS ===== -->
+<div class="task-terminal" id="task-terminal">
+  <div class="task-term-header">⏣ LOG DE TAREAS</div>
+  <div class="task-term-body" id="task-term-body">
+    <div class="task-line"><span class="task-time">[--:--:--]</span> <span class="task-agent">SISTEMA</span> <span class="task-msg">Inicializando Matrix HUD...</span></div>
+  </div>
 </div>
 <script>
+// ===== HISTORIAL DE TAREAS =====
+const taskHistory = [];
+let taskHistoryIndex = 0;
+function addTaskLog(agentName, emoji, message) {
+  const now = new Date();
+  const time = now.toLocaleTimeString();
+  taskHistory.push({ time, agent: agentName, emoji, msg: message });
+  const body = document.getElementById('task-term-body');
+  if (!body) return;
+  const line = document.createElement('div');
+  line.className = 'task-line';
+  line.innerHTML = `<span class="task-time">[${time}]</span> <span class="task-agent">${emoji} ${agentName}</span> <span class="task-msg">${message}</span>`;
+  body.appendChild(line);
+  body.scrollTop = body.scrollHeight;
+  // Keep max 50 lines
+  while (body.children.length > 50) body.removeChild(body.firstChild);
+}
 // ===== ERROR CATCHER =====
 window.onerror = function(msg, url, line) {
   document.body.innerHTML = '<div style="color:#d4af37;font-family:monospace;padding:40px;font-size:14px">' +
@@ -525,6 +587,31 @@ function getBreakXY(idx) {
   return { x: rx, y: ry };
 }
 
+function getDeskXY(idx) {
+  // 2 filas de 5 cubiculos
+  // Fila 0: agentes 0-4 (y=28%), Fila 1: agentes 5-9 (y=52%)
+  // x espaciado uniforme: 10,25,40,55,70%
+  const row = idx < 5 ? 0 : 1;
+  const col = idx % 5;
+  const x = [10, 25, 40, 55, 70][col];
+  const y = row === 0 ? 28 : 52;
+  return { x, y };
+}
+
+function getBreakXY(idx) {
+  // Cafeteria (izquierda): agentes 0-4
+  // Gaming Zone (derecha): agentes 5-9
+  if (idx < 5) {
+    // Cafeteria - esquina inferior izquierda
+    const col = idx;
+    return { x: 3 + col * 15, y: 78 + (col % 2) * 8 };
+  } else {
+    // Gaming Zone - esquina inferior derecha
+    const col = idx - 5;
+    return { x: 50 + col * 12, y: 78 + (col % 2) * 8 };
+  }
+}
+
 function posToPixels(px, py) {
   const map = document.getElementById('office-map');
   if (!map) return { x: 0, y: 0 };
@@ -685,17 +772,20 @@ updateAgent = (function(orig) {
 function switchView(view) {
   const grid = document.getElementById('agents-grid');
   const map = document.getElementById('office-map');
+  const term = document.getElementById('task-terminal');
   const btnGrid = document.getElementById('btn-grid');
   const btnMap = document.getElementById('btn-map');
   if (!grid || !map) return;
   if (view === 'grid') {
     grid.style.display = 'grid';
     map.style.display = 'none';
+    if (term) term.style.display = 'none';
     btnGrid.classList.add('active');
     btnMap.classList.remove('active');
   } else {
     grid.style.display = 'none';
     map.style.display = 'block';
+    if (term) term.style.display = 'block';
     btnGrid.classList.remove('active');
     btnMap.classList.add('active');
     createAgentSprites();
@@ -788,22 +878,23 @@ function updateAgent(agentId, newStatus, task, subtitle, progress, fromServer) {
       if (progressEl) animateProgress(progressEl, pct);
       break;
     case 'done':
+      const doneTask = task || 'tarea completada';
       card.classList.add('done');
       statusEl.className = 'agent-status status-done';
       statusEl.innerHTML = '●';
       statusEl.style.color = '#ffd700';
       statusEl.style.textShadow = '0 0 8px #ffd700';
-      taskEl.textContent = task || '✓ completado';
+      taskEl.textContent = '✓ ' + doneTask;
       stopTerminal(agentId);
       stopQuotes(agentId);
-      if (quoteEl) quoteEl.textContent = '✓ ' + (task || 'tarea completada');
-      const term = document.getElementById('term-' + agentId);
-      if (term) term.innerHTML = '<div class="term-output">✓ completo</div>';
+      if (quoteEl) quoteEl.textContent = '✓ ' + doneTask;
+      const termDone = document.getElementById('term-' + agentId);
+      if (termDone) termDone.innerHTML = '<div class="term-output">✓ completo</div>';
       if (progressEl) {
         progressEl.textContent = pct + '%';
         progressEl.style.opacity = '1';
       }
-      // Solo auto-idle si NO viene del servidor (para no competir con pollStatus)
+      updateLog(agentId, '✓ ' + doneTask);
       if (!fromServer) setTimeout(() => updateAgent(agentId, 'idle', '', '', 0), 5000);
       break;
   }
@@ -811,7 +902,10 @@ function updateAgent(agentId, newStatus, task, subtitle, progress, fromServer) {
 }
 function generateParticles(agentId){const c=document.getElementById('particles-'+agentId);if(!c)return;c.innerHTML='';for(let i=0;i<6;i++){const p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDelay=Math.random()*3+'s';p.style.background=['#d4af37','#ffd700','#fff'][Math.floor(Math.random()*3)];c.appendChild(p);}}
 function updateActiveCount(){document.getElementById('active-count').textContent=Object.values(statuses).filter(s=>s.status==='working').length+' ACTIVE';}
-function updateLog(agentId,task){const a=agents.find(x=>x.id===agentId);document.getElementById('log-text').textContent=`[${new Date().toLocaleTimeString()}] ${a.emoji} ${a.name} → ${task}`;}
+function updateLog(agentId,task,status){
+  const a=agents.find(x=>x.id===agentId);
+  if(a) addTaskLog(a.name, a.emoji, task || status || '---');
+}
 // Poll — evitar re-animaciones comparando con último estado
 async function pollStatus() {
   try {
@@ -823,6 +917,11 @@ async function pollStatus() {
       // Comparar con último estado del servidor para evitar re-aplicar
       const key = u.agent;
       const prev = lastServerState[key];
+      // First time seeing this agent? Log it
+      if (!prev && u.status !== 'idle' && u.task) {
+        const a = agents.find(x => x.id === u.agent);
+        if (a) addTaskLog(a.name, a.emoji, u.task);
+      }
       if (prev && prev.status === u.status && prev.progress === u.progress && prev.task === u.task) return;
       lastServerState[key] = { status: u.status, progress: u.progress, task: u.task };
       updateAgent(u.agent, u.status, u.task || '', '', u.progress || 0, true);
