@@ -36,18 +36,13 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = parsed.path
         
-        if path == '/' or path == '/index.html' or path == '/star-wars.html':
-            filename = 'matrix_hud.html' if path in ('/', '/index.html') else 'star-wars.html'
+        if path == '/' or path == '/index.html':
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            file_path = os.path.join(BASE, filename)
-            if os.path.exists(file_path):
-                with open(file_path, 'rb') as f:
-                    self.wfile.write(f.read())
-            else:
-                self.wfile.write(b'<html><body><h1>404</h1></body></html>')
+            with open(HUD_FILE, 'rb') as f:
+                self.wfile.write(f.read())
                 
         elif path.startswith('/agent-photos/'):
             # Serve agent photos
