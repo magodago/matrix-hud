@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NEO TRADING — Bot Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root { --cyan: #00d4ff; --magenta: #ff15d0; --gold: #ffd700; --green: #00ff41; --dark: #0a0a0f; }
+body { background:#000; color:#fff; font-family:'Share Tech Mono',monospace; min-height:100vh; }
+.bg-grid { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; opacity:0.03;
+  background-image:linear-gradient(var(--cyan) 1px,transparent 1px),linear-gradient(90deg,var(--cyan) 1px,transparent 1px);
+  background-size:40px 40px; }
+.header { position:relative; z-index:1; padding:16px 20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(0,212,255,0.1); }
+.header h1 { font-family:'Orbitron',monospace; font-size:20px; color:var(--cyan); text-shadow:0 0 20px rgba(0,212,255,0.3); letter-spacing:3px; }
+.header .sub { font-size:11px; color:rgba(255,255,255,0.3); letter-spacing:1px; margin-left:8px; }
+.status { margin-left:auto; display:flex; align-items:center; gap:6px; font-size:11px; }
+.status-dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green); animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.container { position:relative; z-index:1; max-width:1000px; margin:0 auto; padding:16px; }
+/* CARDS */
+.row { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; margin-bottom:12px; }
+@media (max-width:700px) { .row { grid-template-columns:1fr 1fr; } }
+.stat { background:rgba(0,212,255,0.03); border:1px solid rgba(0,212,255,0.08); border-radius:8px; padding:12px; text-align:center; }
+.stat .val { font-family:'Orbitron',monospace; font-size:clamp(18px,2.5vw,28px); font-weight:900; }
+.stat .lbl { font-size:9px; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:2px; margin-top:2px; }
+.up { color:var(--green) } .down { color:#ff4444 } .cyan { color:var(--cyan) } .gold { color:var(--gold) }
+/* TABLE */
+.section { background:rgba(0,212,255,0.02); border:1px solid rgba(0,212,255,0.06); border-radius:8px; margin-bottom:12px; overflow:hidden; }
+.section h2 { font-family:'Orbitron',monospace; font-size:12px; color:var(--cyan); padding:10px 14px; letter-spacing:2px; border-bottom:1px solid rgba(0,212,255,0.06); }
+table { width:100%; border-collapse:collapse; font-size:11px; }
+th { text-align:left; padding:8px 10px; color:rgba(255,255,255,0.3); font-weight:400; letter-spacing:1px; border-bottom:1px solid rgba(0,212,255,0.04); text-transform:uppercase; font-size:9px; }
+td { padding:8px 10px; border-bottom:1px solid rgba(0,212,255,0.02); color:rgba(255,255,255,0.7); }
+tr:hover td { background:rgba(0,212,255,0.03); }
+.tag { display:inline-block; padding:2px 8px; border-radius:10px; font-size:9px; letter-spacing:1px; }
+.tag-open { border:1px solid rgba(0,212,255,0.3); color:var(--cyan); }
+.tag-closed { border:1px solid rgba(0,255,65,0.3); color:var(--green); }
+.tag-win { border:1px solid rgba(0,255,65,0.3); color:var(--green); }
+.tag-loss { border:1px solid rgba(255,68,68,0.3); color:#ff4444; }
+/* SIGNALS */
+.signal-row { display:flex; gap:8px; padding:6px 14px; border-bottom:1px solid rgba(0,212,255,0.02); align-items:center; font-size:11px; }
+.signal-row:last-child { border-bottom:none; }
+.signal-row .score { font-family:'Orbitron',monospace; font-size:16px; font-weight:900; min-width:36px; text-align:center; }
+.signal-row .info { flex:1; }
+.signal-row .info .q { color:rgba(255,255,255,0.7); }
+.signal-row .info .meta { font-size:9px; color:rgba(255,255,255,0.3); }
+/* LOG */
+#log { font-size:10px; color:rgba(0,212,255,0.4); padding:8px 14px; max-height:120px; overflow-y:auto; }
+#log div { padding:1px 0; }
+.footer { text-align:center; padding:20px; font-size:10px; color:rgba(255,255,255,0.15); letter-spacing:2px; position:relative; z-index:1; }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="header">
+  <h1>⬡ NEO.BOT</h1>
+  <span class="sub">TRADING AI · POLYMARKET</span>
+  <div class="status">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">CONECTANDO</span>
+    <span style="color:rgba(255,255,255,0.2);margin-left:8px" id="clock">--:--:--</span>
+  </div>
+</div>
+<div class="container">
+  <div class="row" id="stats-row">
+    <div class="stat"><div class="val cyan" id="capital">--</div><div class="lbl">Capital Disponible</div></div>
+    <div class="stat"><div class="val gold" id="portfolio">--</div><div class="lbl">Valor Cartera</div></div>
+    <div class="stat"><div class="val" id="pnl">--</div><div class="lbl">P&L Total</div></div>
+    <div class="stat"><div class="val" id="trades-count">--</div><div class="lbl">Trades Totales</div></div>
+  </div>
+
+  <div class="section">
+    <h2>⬡ POSICIONES ABIERTAS</h2>
+    <div id="positions-body"><div style="padding:14px;color:rgba(255,255,255,0.2);font-size:11px">Cargando...</div></div>
+  </div>
+
+  <div class="section">
+    <h2>⬡ SEÑALES · OPORTUNIDADES</h2>
+    <div id="signals-body"><div style="padding:14px;color:rgba(255,255,255,0.2);font-size:11px">Cargando...</div></div>
+  </div>
+
+  <div class="section">
+    <h2>⬡ HISTORIAL DE TRADES</h2>
+    <div id="history-body"><div style="padding:14px;color:rgba(255,255,255,0.2);font-size:11px">Cargando...</div></div>
+  </div>
+
+  <div class="section">
+    <h2>⬡ LOG DEL SISTEMA</h2>
+    <div id="log"></div>
+  </div>
+</div>
+<div class="footer">NEO TRADING BOT · NEO Agentic AI · DATOS EN VIVO POLYMARKET</div>
+
+<script>
+const API = 'https://matrix-hud.onrender.com/bot-status';
+let state = {};
+
+function log(msg) {
+  const el = document.getElementById('log');
+  const d = document.createElement('div');
+  d.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+
+async function fetchState() {
+  try {
+    const r = await fetch(API);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    state = await r.json();
+    document.getElementById('status-text').textContent = 'ONLINE';
+    document.getElementById('status-dot').style.background = '#00ff41';
+    render();
+  } catch(e) {
+    document.getElementById('status-text').textContent = 'OFFLINE';
+    document.getElementById('status-dot').style.background = '#ff4444';
+    log(`Error: ${e.message}`);
+    // Fallback: try loading from bot_status.json directly
+    try {
+      const r2 = await fetch('/bot_status.json');
+      if (r2.ok) { state = await r2.json(); render(); }
+    } catch(e2) {}
+  }
+}
+
+function render() {
+  // Stats
+  const pnl = state.total_pnl || 0;
+  document.getElementById('capital').textContent = '$' + (state.capital || 0).toLocaleString('en',{minimumFractionDigits:2});
+  document.getElementById('portfolio').textContent = '$' + (state.portfolio_value || 0).toLocaleString('en',{minimumFractionDigits:2});
+  const pnlEl = document.getElementById('pnl');
+  pnlEl.textContent = (pnl >= 0 ? '+' : '') + '$' + pnl.toLocaleString('en',{minimumFractionDigits:2});
+  pnlEl.className = 'val ' + (pnl >= 0 ? 'up' : 'down');
+  document.getElementById('trades-count').textContent = state.total_trades || 0;
+
+  // Positions
+  const pos = state.positions || [];
+  let posHtml = '';
+  if (pos.length === 0) {
+    posHtml = '<div style="padding:14px;color:rgba(255,255,255,0.2);font-size:11px">Sin posiciones abiertas</div>';
+  } else {
+    posHtml = '<table><tr><th>Mercado</th><th>Tipo</th><th>Entry</th><th>Size</th><th>P&L</th><th>Estado</th></tr>';
+    pos.forEach(p => {
+      const pnl = p.pnl || 0;
+      const pnlClass = pnl >= 0 ? 'up' : 'down';
+      posHtml += `<tr>
+        <td>${(p.market||'').slice(0,45)}</td>
+        <td><span class="tag tag-open">${p.type||'BUY'}</span></td>
+        <td>${p.entry||0}%</td>
+        <td>$${(p.size||0).toFixed(0)}</td>
+        <td class="${pnlClass}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</td>
+        <td><span class="tag ${p.status==='open'?'tag-open':'tag-closed'}">${p.status||'open'}</span></td>
+      </tr>`;
+    });
+    posHtml += '</table>';
+  }
+  document.getElementById('positions-body').innerHTML = posHtml;
+
+  // Signals
+  const sigs = state.signals || [];
+  let sigHtml = '';
+  if (sigs.length === 0) {
+    sigHtml = '<div style="padding:14px;color:rgba(255,255,255,0.2);font-size:11px">Esperando señales...</div>';
+  } else {
+    sigs.forEach(s => {
+      sigHtml += `<div class="signal-row">
+        <div class="score cyan">${s.score||0}</div>
+        <div class="info">
+          <div class="q">${(s.q||'?').slice(0,50)}</div>
+          <div class="meta">${s.slug||''} · YES ${s.yes}% · Vol $${(s.vol||0).toLocaleString('en')}</div>
+        </div>
+      </div>`;
+    });
+  }
+  document.getElementById('signals-body').innerHTML = sigHtml;
+
+  // History
+  const hist = state.trade_history || [];
+  let histHtml = '';
+  if (hist.length === 0) {
+    histHtml = '<div style="padding:14px;color:rgba(255,255,255,0.2);font-size:11px">Sin historial</div>';
+  } else {
+    histHtml = '<table><tr><th>Hora</th><th>Mercado</th><th>Tipo</th><th>Precio</th><th>Size</th><th>Resultado</th></tr>';
+    hist.slice(-10).reverse().forEach(t => {
+      const pnl = t.pnl || 0;
+      const pnlClass = pnl > 0 ? 'up' : (pnl < 0 ? 'down' : '');
+      histHtml += `<tr>
+        <td style="font-size:9px;color:rgba(255,255,255,0.3)">${(t.timestamp||'').slice(11,19)}</td>
+        <td>${(t.market||'').slice(0,40)}</td>
+        <td><span class="tag tag-open">${t.type||''}</span></td>
+        <td>${t.entry||0}%</td>
+        <td>$${(t.size||0).toFixed(0)}</td>
+        <td class="${pnlClass}">${pnl !== 0 ? (pnl > 0 ? '+' : '') + '$' + pnl.toFixed(2) : '--'}</td>
+      </tr>`;
+    });
+    histHtml += '</table>';
+  }
+  document.getElementById('history-body').innerHTML = histHtml;
+  
+  log(`Cartera: $${(state.portfolio_value||0).toFixed(0)} | ${pos.filter(p=>p.status==='open').length} posiciones abiertas`);
+}
+
+// Clock
+function updateClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Poll
+fetchState();
+setInterval(fetchState, 5000);
+</script>
+</body>
+</html>

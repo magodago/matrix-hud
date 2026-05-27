@@ -44,6 +44,30 @@ class Handler(BaseHTTPRequestHandler):
             with open(HUD_FILE, 'rb') as f:
                 self.wfile.write(f.read())
                 
+        elif path == '/bot-dashboard.html':
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            bpath = os.path.join(BASE, 'bot-dashboard.html')
+            if os.path.exists(bpath):
+                with open(bpath, 'rb') as f:
+                    self.wfile.write(f.read())
+            else:
+                self.wfile.write(b'<h1>Dashboard not found</h1>')
+                
+        elif path == '/bot-status':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            bpath = os.path.join(BASE, 'bot_status.json')
+            if os.path.exists(bpath):
+                with open(bpath, 'rb') as f:
+                    self.wfile.write(f.read())
+            else:
+                self.wfile.write(b'{"status":"no_data"}')
+                
         elif path.startswith('/agent-photos/'):
             # Serve agent photos
             filename = os.path.basename(path)
