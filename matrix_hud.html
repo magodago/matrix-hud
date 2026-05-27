@@ -1014,14 +1014,18 @@ function switchView(view) {
     btnMap.classList.add('active');
     setTimeout(() => { initCurtain(); }, 100);
     createAgentSprites();
-    // Sincronizar sprites con estado actual inmediatamente
+    // Sincronizar sprites — AHORA CAMINAN, no teletransporte
     agents.forEach(agent => {
       const a = lastServerState[agent.id];
       if (a && a.status !== 'idle') {
-        const idx = agents.indexOf(agent);
-        const desk = getDeskXY(idx);
-        placeSpriteAt(agent.id, desk.x, desk.y, a.status === 'done' ? 'done' : 'working');
         agentStates[agent.id] = a.status;
+        if (a.status === 'working') {
+          animateToDesk(agent.id);
+        } else if (a.status === 'done') {
+          // Done: primero camina al puesto, luego a descanso
+          animateToDesk(agent.id);
+          setTimeout(() => animateToBreak(agent.id), 4000);
+        }
       }
     });
   }
