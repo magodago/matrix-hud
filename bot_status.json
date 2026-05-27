@@ -1,134 +1,18 @@
 {
-  "capital": 27.4625,
-  "portfolio_value": 97.34,
-  "positions": [
-    {
-      "ts": "2026-05-27T18:20:03.449281+00:00",
-      "market": "Will Portugal win the 2026 FIFA World Cup?",
-      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
-      "type": "BUY_YES",
-      "entry": 10.5,
-      "shares": 323.24,
-      "size": 33.94,
-      "gross": 35.0,
-      "fees": {
-        "total": 1.06,
-        "gas": 0.5
-      },
-      "score": 96.7,
-      "conf": "high",
-      "status": "open",
-      "pnl": 0,
-      "cp": 10.5
-    },
-    {
-      "ts": "2026-05-27T18:20:03.449318+00:00",
-      "market": "Will Netherlands win the 2026 FIFA World Cup?",
-      "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
-      "type": "BUY_YES",
-      "entry": 3.9,
-      "shares": 561.18,
-      "size": 21.89,
-      "gross": 22.75,
-      "fees": {
-        "total": 0.864,
-        "gas": 0.5
-      },
-      "score": 96.6,
-      "conf": "high",
-      "status": "open",
-      "pnl": 0,
-      "cp": 3.9
-    },
-    {
-      "ts": "2026-05-27T18:20:03.449329+00:00",
-      "market": "Will Brazil win the 2026 FIFA World Cup?",
-      "slug": "will-brazil-win-the-2026-fifa-world-cup-183",
-      "type": "BUY_YES",
-      "entry": 9.3,
-      "shares": 151.08,
-      "size": 14.05,
-      "gross": 14.79,
-      "fees": {
-        "total": 0.7366,
-        "gas": 0.5
-      },
-      "score": 96.5,
-      "conf": "high",
-      "status": "open",
-      "pnl": 0,
-      "cp": 9.3
-    }
-  ],
-  "trade_history": [
-    {
-      "ts": "2026-05-27T18:20:03.449281+00:00",
-      "market": "Will Portugal win the 2026 FIFA World Cup?",
-      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
-      "type": "BUY_YES",
-      "entry": 10.5,
-      "shares": 323.24,
-      "size": 33.94,
-      "gross": 35.0,
-      "fees": {
-        "total": 1.06,
-        "gas": 0.5
-      },
-      "score": 96.7,
-      "conf": "high",
-      "status": "open",
-      "pnl": 0,
-      "cp": 10.5
-    },
-    {
-      "ts": "2026-05-27T18:20:03.449318+00:00",
-      "market": "Will Netherlands win the 2026 FIFA World Cup?",
-      "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
-      "type": "BUY_YES",
-      "entry": 3.9,
-      "shares": 561.18,
-      "size": 21.89,
-      "gross": 22.75,
-      "fees": {
-        "total": 0.864,
-        "gas": 0.5
-      },
-      "score": 96.6,
-      "conf": "high",
-      "status": "open",
-      "pnl": 0,
-      "cp": 3.9
-    },
-    {
-      "ts": "2026-05-27T18:20:03.449329+00:00",
-      "market": "Will Brazil win the 2026 FIFA World Cup?",
-      "slug": "will-brazil-win-the-2026-fifa-world-cup-183",
-      "type": "BUY_YES",
-      "entry": 9.3,
-      "shares": 151.08,
-      "size": 14.05,
-      "gross": 14.79,
-      "fees": {
-        "total": 0.7366,
-        "gas": 0.5
-      },
-      "score": 96.5,
-      "conf": "high",
-      "status": "open",
-      "pnl": 0,
-      "cp": 9.3
-    }
-  ],
-  "total_trades": 3,
+  "capital": 100.0,
+  "portfolio_value": 100.0,
+  "positions": [],
+  "trade_history": [],
+  "total_trades": 0,
   "winning_trades": 0,
   "best_trade": 0,
   "worst_trade": 0,
-  "total_fees": 2.6606,
-  "total_pnl": -2.66,
+  "total_fees": 0.0,
+  "total_pnl": 0.0,
   "started_at": "2026-05-27T18:16:56.980150+00:00",
-  "cycle": 13,
-  "last_price": 74840.0,
-  "price_change_24h": 0.14,
+  "cycle": 33,
+  "last_price": 74852.22,
+  "price_change_24h": 0.18,
   "signal": "WAIT",
   "rsi": 50,
   "ema_fast": 0,
@@ -139,7 +23,12 @@
     74732.0,
     74808.89,
     74814.68,
-    74840.0
+    74840.0,
+    74794.0,
+    74810.0,
+    74866.37,
+    74840.0,
+    74866.3
   ],
   "all_prices": [],
   "cfg": {
@@ -183,59 +72,5 @@
   },
   "last_signal_ts": 0,
   "cooloff_until": 0,
-  "last_updated": "2026-05-27T18:20:03.449350+00:00",
-  "total_gas": 1.5,
-  "markets_scanned": 885,
-  "opportunities": [
-    {
-      "q": "Will Portugal win the 2026 FIFA World Cup?",
-      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
-      "yp": 10.5,
-      "sp": 0.1,
-      "vol": 24595926.040299647,
-      "score": 96.7,
-      "rec": "BUY_YES",
-      "conf": "high"
-    },
-    {
-      "q": "Will Netherlands win the 2026 FIFA World Cup?",
-      "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
-      "yp": 3.9,
-      "sp": 0.1,
-      "vol": 23721840.770696472,
-      "score": 96.6,
-      "rec": "BUY_YES",
-      "conf": "high"
-    },
-    {
-      "q": "Will Brazil win the 2026 FIFA World Cup?",
-      "slug": "will-brazil-win-the-2026-fifa-world-cup-183",
-      "yp": 9.3,
-      "sp": 0.1,
-      "vol": 22345203.347485043,
-      "score": 96.5,
-      "rec": "BUY_YES",
-      "conf": "high"
-    },
-    {
-      "q": "Will Argentina win the 2026 FIFA World Cup?",
-      "slug": "will-argentina-win-the-2026-fifa-world-cup-245",
-      "yp": 8.3,
-      "sp": 0.1,
-      "vol": 21979603.142615978,
-      "score": 96.5,
-      "rec": "BUY_YES",
-      "conf": "high"
-    },
-    {
-      "q": "Will Germany win the 2026 FIFA World Cup?",
-      "slug": "will-germany-win-the-2026-fifa-world-cup-467",
-      "yp": 5.1,
-      "sp": 0.1,
-      "vol": 20501692.423591748,
-      "score": 96.4,
-      "rec": "BUY_YES",
-      "conf": "high"
-    }
-  ]
+  "last_updated": "2026-05-27T18:25:18.469824+00:00"
 }
