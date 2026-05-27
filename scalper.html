@@ -150,9 +150,9 @@ async function fetchStatus() {
     const d = await r.json();
     updateUI(d);
   } catch(e) {
-    // Try direct path
+    // Fallback: direct URL
     try {
-      const r = await fetch('/tmp/neo-trading-bot/bot_status.json');
+      const r = await fetch('https://matrix-hud.onrender.com/bot_status.json');
       if (r.ok) updateUI(await r.json());
     } catch(e2) {}
   }
