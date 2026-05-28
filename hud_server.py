@@ -134,7 +134,19 @@ class Handler(BaseHTTPRequestHandler):
                     self.wfile.write(f.read())
             else:
                 self.wfile.write(b'<html><body><h1>Not found</h1></body></html>')
-                
+
+        elif path == '/token-status':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            tp = os.path.join(BASE, 'token_status_cache.json')
+            if os.path.exists(tp):
+                with open(tp, 'rb') as f:
+                    self.wfile.write(f.read())
+            else:
+                self.wfile.write(b'{"error":"no data"}')
+
         else:
             self.send_response(404)
             self.end_headers()
@@ -197,7 +209,24 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_response(400)
                 self.end_headers()
                 self.wfile.write(json.dumps({"error": str(e)}).encode())
-                
+
+        elif path == '/token-update':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length).decode()
+            try:
+                cache = os.path.join(BASE, 'token_status_cache.json')
+                with open(cache, 'w') as f:
+                    f.write(body)
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(b'{"ok":true}')
+            except Exception as e:
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": str(e)}).encode())
+
         else:
             self.send_response(404)
             self.end_headers()

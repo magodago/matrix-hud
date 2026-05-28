@@ -11,6 +11,8 @@ HUD_URL = "https://matrix-hud.onrender.com/update"
 BOT_STATUS = Path("/tmp/neo-trading-bot/bot_status.json")
 TASK_FILE = Path("/tmp/matrix_agent_tasks.json")
 LOG_FILE = Path("/tmp/matrix_watcher.log")
+TOKEN_TRACKER = Path("/home/dorti/matrix-hud/token_tracker.py")
+TOKEN_CACHE = Path("/tmp/matrix_token_cache.json")
 
 log_fh = open(LOG_FILE, "a", buffering=1)
 def log(msg):
@@ -92,6 +94,16 @@ def build_status():
 
     return agents
 
+def read_token_data():
+    """Ejecuta token_tracker.py y devuelve los datos cacheados"""
+    try:
+        # Ejecutar tracker (rápido, solo query SQLite)
+        subprocess.run(["/usr/bin/python3", str(TOKEN_TRACKER)], capture_output=True, timeout=10)
+        with open(TOKEN_CACHE) as f:
+            return json.load(f)
+    except:
+        return None
+
 def main():
     log("Watcher iniciado")
     while True:
@@ -104,6 +116,18 @@ def main():
             result = json.loads(resp.read())
             working = sum(1 for a in agents if a["status"] == "working")
             log(f"📤 {working}/11 working → {result}")
+
+            # También POSTear datos de tokens
+            token_data = read_token_data()
+            if token_data:
+                td = json.dumps(token_data).encode()
+                treq = urllib.request.Request(f"{HUD_URL.replace('/update', '/token-update')}",
+                    data=td, headers={"Content-Type": "application/json"})
+                tresp = urllib.request.urlopen(treq, timeout=5)
+                tlog = json.loads(tresp.read())
+                today = token_data.get("today", {})
+                if "error" not in today:
+                    log(f"💰 Tokens: ${today.get('cost_total', 0):.4f} ({today.get('session_count', 0)} sesiones)")
         except Exception as e:
             log(f"✗ {e}")
         time.sleep(2)
