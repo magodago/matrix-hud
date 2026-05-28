@@ -1,6 +1,6 @@
 {
-  "capital": 27.466511578500842,
-  "portfolio_value": 97.35,
+  "capital": 80.01168598197788,
+  "portfolio_value": 99.98,
   "positions": [
     {
       "ts": "2026-05-28T07:32:00.081226+00:00",
@@ -27,61 +27,27 @@
       "closed_at": "2026-05-28T07:48:00.075212+00:00"
     },
     {
-      "ts": "2026-05-28T07:48:31.606298+00:00",
-      "market": "Will Portugal win the 2026 FIFA World Cup?",
-      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
-      "type": "BUY_YES",
-      "entry": 10.3,
-      "shares": 329.56,
-      "size": 33.95,
-      "gross": 35.01,
-      "fees": {
-        "total": 1.0601,
-        "gas": 0.5
-      },
-      "score": 96.7,
-      "conf": "high",
+      "ts": "2026-05-28T07:52:00.087752+00:00",
+      "entries_ts": 1779954720.0877645,
+      "side": "BUY",
+      "symbol": "BTCUSDT",
+      "entry": 73401.54,
+      "qty": 0.000272,
+      "size": 19.98,
+      "gross": 20.0,
+      "fees": 0.016,
+      "rsi": 8.8,
+      "signal": "LONG",
       "status": "open",
-      "pnl": 0,
-      "cp": 10.3
-    },
-    {
-      "ts": "2026-05-28T07:48:31.606333+00:00",
-      "market": "Will Netherlands win the 2026 FIFA World Cup?",
-      "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
-      "type": "BUY_YES",
-      "entry": 3.8,
-      "shares": 576.03,
-      "size": 21.89,
-      "gross": 22.75,
-      "fees": {
-        "total": 0.8641,
-        "gas": 0.5
-      },
-      "score": 96.6,
-      "conf": "high",
-      "status": "open",
-      "pnl": 0,
-      "cp": 3.8
-    },
-    {
-      "ts": "2026-05-28T07:48:31.606344+00:00",
-      "market": "Will Brazil win the 2026 FIFA World Cup?",
-      "slug": "will-brazil-win-the-2026-fifa-world-cup-183",
-      "type": "BUY_YES",
-      "entry": 9.3,
-      "shares": 151.11,
-      "size": 14.05,
-      "gross": 14.79,
-      "fees": {
-        "total": 0.7366,
-        "gas": 0.5
-      },
-      "score": 96.6,
-      "conf": "high",
-      "status": "open",
-      "pnl": 0,
-      "cp": 9.3
+      "pnl": -0.01,
+      "pnl_pct": 0.01,
+      "exit_price": 0,
+      "exit_reason": "",
+      "trailing_activated": false,
+      "trailing_sl": 0,
+      "tp": 73952.05,
+      "sl": 73034.53,
+      "current_price": 73412.47
     }
   ],
   "trade_history": [
@@ -110,80 +76,46 @@
       "closed_at": "2026-05-28T07:48:00.075212+00:00"
     },
     {
-      "ts": "2026-05-28T07:48:31.606298+00:00",
-      "market": "Will Portugal win the 2026 FIFA World Cup?",
-      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
-      "type": "BUY_YES",
-      "entry": 10.3,
-      "shares": 329.56,
-      "size": 33.95,
-      "gross": 35.01,
-      "fees": {
-        "total": 1.0601,
-        "gas": 0.5
-      },
-      "score": 96.7,
-      "conf": "high",
+      "ts": "2026-05-28T07:52:00.087752+00:00",
+      "entries_ts": 1779954720.0877645,
+      "side": "BUY",
+      "symbol": "BTCUSDT",
+      "entry": 73401.54,
+      "qty": 0.000272,
+      "size": 19.98,
+      "gross": 20.0,
+      "fees": 0.016,
+      "rsi": 8.8,
+      "signal": "LONG",
       "status": "open",
-      "pnl": 0,
-      "cp": 10.3
-    },
-    {
-      "ts": "2026-05-28T07:48:31.606333+00:00",
-      "market": "Will Netherlands win the 2026 FIFA World Cup?",
-      "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
-      "type": "BUY_YES",
-      "entry": 3.8,
-      "shares": 576.03,
-      "size": 21.89,
-      "gross": 22.75,
-      "fees": {
-        "total": 0.8641,
-        "gas": 0.5
-      },
-      "score": 96.6,
-      "conf": "high",
-      "status": "open",
-      "pnl": 0,
-      "cp": 3.8
-    },
-    {
-      "ts": "2026-05-28T07:48:31.606344+00:00",
-      "market": "Will Brazil win the 2026 FIFA World Cup?",
-      "slug": "will-brazil-win-the-2026-fifa-world-cup-183",
-      "type": "BUY_YES",
-      "entry": 9.3,
-      "shares": 151.11,
-      "size": 14.05,
-      "gross": 14.79,
-      "fees": {
-        "total": 0.7366,
-        "gas": 0.5
-      },
-      "score": 96.6,
-      "conf": "high",
-      "status": "open",
-      "pnl": 0,
-      "cp": 9.3
+      "pnl": -0.01,
+      "pnl_pct": 0.01,
+      "exit_price": 0,
+      "exit_reason": "",
+      "trailing_activated": false,
+      "trailing_sl": 0,
+      "tp": 73952.05,
+      "sl": 73034.53,
+      "current_price": 73412.47
     }
   ],
-  "total_trades": 4,
+  "total_trades": 2,
   "winning_trades": 1,
   "best_trade": 0.03,
   "worst_trade": 0,
-  "total_fees": 2.6847615343835436,
-  "total_pnl": -2.65,
+  "total_fees": 0.03999433719639558,
+  "total_pnl": -0.02,
   "started_at": "2026-05-28T06:53:24.968521+00:00",
-  "cycle": 219,
-  "last_price": 73411.8,
-  "price_change_24h": 0.42,
+  "cycle": 244,
+  "last_price": 73417.88,
+  "price_change_24h": 0.37,
   "signal": "WAIT",
-  "rsi": 61.2,
-  "ema_fast": 73454.53,
-  "ema_slow": 73431.18,
-  "bb_upper": 73545.61,
-  "bb_middle": 73395.59,
-  "bb_lower": 73245.57,
+  "rsi": 22.5,
+  "ema_fast": 73416.33,
+  "ema_slow": 73421.14,
+  "bb_upper": 73488.41,
+  "bb_middle": 73432.37,
+  "bb_lower": 73376.32,
   "status": "running",
   "mode": "v4.6_research",
   "close_prices": [
@@ -241,7 +173,13 @@
     73502.0,
     73447.39,
     73452.85,
-    73450.0
+    73450.0,
+    73428.7,
+    73434.01,
+    73408.41,
+    73401.54,
+    73412.74,
+    73412.47
   ],
   "all_prices": [],
   "cfg": {
@@ -266,7 +204,7 @@
     "cooldown_after_loss": 60
   },
   "perf": {
-    "total_trades": 1,
+    "total_trades": 2,
     "wins": 1,
     "losses": 0,
     "win_rate": 1.0,
@@ -276,69 +214,15 @@
     "worst_trade": 0,
     "consecutive_wins": 1,
     "consecutive_losses": 0,
-    "total_fees": 0.023992,
-    "net_pnl": 0.01,
+    "total_fees": 0.03999433719639558,
+    "net_pnl": -0.02,
     "adjustments": [],
-    "hourly_pnl": 0.03460747747235789,
-    "hour_trades": 1,
-    "last_hour_reset": "2026-05-28T06:53:24.968497+00:00"
+    "hourly_pnl": 0,
+    "hour_trades": 0,
+    "last_hour_reset": "2026-05-28T07:54:00.092497+00:00"
   },
   "last_signal_ts": 0,
   "cooloff_until": 0,
-  "last_updated": "2026-05-28T07:48:31.606363+00:00",
-  "prev_ema_fast": 73454.53400715935,
-  "total_gas": 1.5,
-  "markets_scanned": 885,
-  "opportunities": [
-    {
-      "q": "Will Portugal win the 2026 FIFA World Cup?",
-      "slug": "will-portugal-win-the-2026-fifa-world-cup-912",
-      "yp": 10.3,
-      "sp": 0.1,
-      "vol": 24869871.448683664,
-      "score": 96.7,
-      "rec": "BUY_YES",
-      "conf": "high"
-    },
-    {
-      "q": "Will Netherlands win the 2026 FIFA World Cup?",
-      "slug": "will-netherlands-win-the-2026-fifa-world-cup-739",
-      "yp": 3.8,
-      "sp": 0.1,
-      "vol": 23909072.01013947,
-      "score": 96.6,
-      "rec": "BUY_YES",
-      "conf": "high"
-    },
-    {
-      "q": "Will Brazil win the 2026 FIFA World Cup?",
-      "slug": "will-brazil-win-the-2026-fifa-world-cup-183",
-      "yp": 9.3,
-      "sp": 0.1,
-      "vol": 22557848.9187771,
-      "score": 96.6,
-      "rec": "BUY_YES",
-      "conf": "high"
-    },
-    {
-      "q": "Will Argentina win the 2026 FIFA World Cup?",
-      "slug": "will-argentina-win-the-2026-fifa-world-cup-245",
-      "yp": 8.3,
-      "sp": 0.1,
-      "vol": 22209265.755807944,
-      "score": 96.5,
-      "rec": "BUY_YES",
-      "conf": "high"
-    },
-    {
-      "q": "Will the San Antonio Spurs win the 2026 NBA Finals?",
-      "slug": "will-the-san-antonio-spurs-win-the-2026-nba-finals",
-      "yp": 14.9,
-      "sp": 0.2,
-      "vol": 31145776.64961638,
-      "score": 96.5,
-      "rec": "BUY_YES",
-      "conf": "high"
-    }
-  ]
+  "last_updated": "2026-05-28T07:54:54.564657+00:00",
+  "prev_ema_fast": 73416.33331475749
 }
