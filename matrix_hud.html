@@ -447,6 +447,7 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
   <span class="token-stat"><span class="label">HOY</span><span class="value usd" id="token-cost-today">$--</span></span>
   <span class="token-sep">|</span>
   <span class="token-stat"><span class="label">IN</span><span class="value" id="token-in">--</span></span>
+  <span class="token-stat"><span class="label">CACHE</span><span class="value" style="color:#00ccff;font-weight:bold;letter-spacing:0.5px" id="token-cache">--</span></span>
   <span class="token-stat"><span class="label">OUT</span><span class="value" id="token-out">--</span></span>
   <span class="token-sep">|</span>
   <span class="token-stat"><span class="label">SESIONES</span><span class="value" id="token-sessions">--</span></span>
@@ -1224,6 +1225,7 @@ async function pollTokenCost() {
     if (today.error) return;
     document.getElementById('token-cost-today').textContent = '$' + (today.cost_total || 0).toFixed(4);
     document.getElementById('token-in').textContent = formatTokens(today.tokens_input || 0);
+    document.getElementById('token-cache').textContent = formatTokens(today.tokens_cache_read || 0);
     document.getElementById('token-out').textContent = formatTokens(today.tokens_output || 0);
     document.getElementById('token-sessions').textContent = today.session_count || '--';
   } catch(e) {}
