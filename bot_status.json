@@ -16,14 +16,14 @@
       "signal": "LONG",
       "status": "open",
       "pnl": 0.03,
-      "pnl_pct": 0.2,
+      "pnl_pct": 0.22,
       "exit_price": 0,
       "exit_reason": "",
       "trailing_activated": true,
-      "trailing_sl": 73294.47728,
+      "trailing_sl": 73304.45728,
       "tp": 73843.43,
       "sl": 72927.26,
-      "current_price": 73441.36
+      "current_price": 73451.36
     }
   ],
   "trade_history": [
@@ -41,14 +41,14 @@
       "signal": "LONG",
       "status": "open",
       "pnl": 0.03,
-      "pnl_pct": 0.2,
+      "pnl_pct": 0.22,
       "exit_price": 0,
       "exit_reason": "",
       "trailing_activated": true,
-      "trailing_sl": 73294.47728,
+      "trailing_sl": 73304.45728,
       "tp": 73843.43,
       "sl": 72927.26,
-      "current_price": 73441.36
+      "current_price": 73451.36
     }
   ],
   "total_trades": 1,
@@ -58,16 +58,16 @@
   "total_fees": 0.016,
   "total_pnl": 0.05,
   "started_at": "2026-05-28T06:53:24.968521+00:00",
-  "cycle": 177,
-  "last_price": 73441.36,
-  "price_change_24h": 0.4,
+  "cycle": 198,
+  "last_price": 73452.9,
+  "price_change_24h": 0.42,
   "signal": "WAIT",
-  "rsi": 98.3,
-  "ema_fast": 73403.47,
-  "ema_slow": 73351.24,
-  "bb_upper": 73431.17,
-  "bb_middle": 73320.2,
-  "bb_lower": 73209.22,
+  "rsi": 69.8,
+  "ema_fast": 73430.03,
+  "ema_slow": 73394.53,
+  "bb_upper": 73496.04,
+  "bb_middle": 73352.09,
+  "bb_lower": 73208.14,
   "status": "running",
   "mode": "v4.6_research",
   "close_prices": [
@@ -115,7 +115,12 @@
     73374.01,
     73415.04,
     73434.66,
-    73441.36
+    73441.36,
+    73444.49,
+    73419.39,
+    73416.78,
+    73423.04,
+    73451.36
   ],
   "all_prices": [],
   "cfg": {
@@ -159,6 +164,6 @@
   },
   "last_signal_ts": 0,
   "cooloff_until": 0,
-  "last_updated": "2026-05-28T07:38:01.939799+00:00",
-  "prev_ema_fast": 73403.4674694847
+  "last_updated": "2026-05-28T07:43:19.198205+00:00",
+  "prev_ema_fast": 73430.0269918663
 }
