@@ -15,16 +15,8 @@ PORT = int(os.environ.get('PORT', 3333))
 
 # Initial status — todos IDLE (los datos reales llegan del monitor)
 initial_status = [
-    {"agent": "neo", "status": "idle", "progress": 0, "task": ""},
-    {"agent": "morpheus", "status": "idle", "progress": 0, "task": ""},
-    {"agent": "trinity", "status": "idle", "progress": 0, "task": ""},
-    {"agent": "tank", "status": "idle", "progress": 0, "task": ""},
-    {"agent": "switch", "status": "idle", "progress": 0, "task": ""},
-    {"agent": "smith", "status": "idle", "progress": 0, "task": ""},
-    {"agent": "oracle", "status": "idle", "progress": 0, "task": ""},
     {"agent": "keymaker", "status": "idle", "progress": 0, "task": ""},
     {"agent": "sati", "status": "idle", "progress": 0, "task": ""},
-    {"agent": "mouse", "status": "idle", "progress": 0, "task": ""},
     {"agent": "apoc", "status": "idle", "progress": 0, "task": ""},
 ]
 
