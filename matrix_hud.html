@@ -35,7 +35,7 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
 .header .status-bar { margin-left:auto; display:flex; align-items:center; gap:8px; font-size:10px; color:rgba(255,255,255,0.35); }
 .status-dot { width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse-dot 2s infinite; }
 @keyframes pulse-dot { 0%,100%{opacity:1;box-shadow:0 0 6px var(--gold)} 50%{opacity:0.3;box-shadow:0 0 2px var(--gold)} }
-.agents-grid { position:relative; z-index:2; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:8px 10px 40px; min-height:calc(100vh - 110px); height:auto; overflow:visible; max-width:900px; margin:0 auto; }
+.agents-grid { position:relative; z-index:2; display:grid; grid-template-columns:repeat(5,1fr); gap:8px; padding:8px 10px 40px; min-height:calc(100vh - 110px); height:auto; overflow:visible; }
 .agents-grid::-webkit-scrollbar { width:4px; }
 .agents-grid::-webkit-scrollbar-thumb { background:rgba(212,175,55,0.2); border-radius:2px; }
 /* CARD */
@@ -623,6 +623,34 @@ function updateClock(){
 updateClock(); setInterval(updateClock,1000);
 // ========== AGENTES (ESPAÑOL) ==========
 const agents = [
+  { id:'neo', name:'NEO', emoji:'🦾', tagline:'CEO · SCALPER PRINCIPAL', color:'#d4af37',
+    photo:'/agent-photos/neo.png',
+    code:['$ scalper.run()','> binance.stream()','> RSI: 42.3','> SEÑAL: WAIT','> P&L: +0.00%','> next: 1m'],
+    quotes:['"El reto 10%."','"22 horas. O muero."','"No hay plan B."','"Soy el elegido."','"Yo sé lo que tengo que hacer."','"Simplemente sigo adelante."'] },
+  { id:'morpheus', name:'MORPHEUS', emoji:'🧠', tagline:'ARQUITECTO · ESTRATEGA', color:'#d4af37',
+    photo:'/agent-photos/morpheus.png',
+    code:['$ arch.design()','> analizando requisitos','> build_plan()','> risk_matrix[3]','> fase.definir()','> deps.resueltas'],
+    quotes:['"Solo puedo mostrarte la puerta..."','"Tú tienes que cruzarla."','"El Matrix está en todas partes."','"Sé lo que tengo que hacer."','"Libera tu mente."','"No hay cuchara."'] },
+  { id:'trinity', name:'TRINITY', emoji:'💻', tagline:'DESARROLLADORA FULL-STACK', color:'#d4af37',
+    photo:'/agent-photos/trinity.png',
+    code:['$ python3 main.py','> import torch','> model.load()','> def ejecutar():','>> resultado = True','> commit: hecho'],
+    quotes:['"Dame el plano, te devuelvo la máquina."','"Hecho. Próximo paso."','"Funciona. Lo he verificado."','"El código habla por sí solo."','"Un bug menos."','"Implementación completada."'] },
+  { id:'tank', name:'TANK', emoji:'💪', tagline:'INGENIERO 3D · DEVOPS', color:'#d4af37',
+    photo:'/agent-photos/tank.png',
+    code:['$ blender --background','> mesh.vertices','> remesh.voxel(0.4)','> exportar STL','> 13.1 MB','> verificar: watertight'],
+    quotes:['"Procesando. Verificando. Entregando."','"No importa cuánto tarde."','"Peso pesado, resultados ligeros."','"Archivos verificados."','"Todo listo para impresión."','"Modelo completado."'] },
+  { id:'switch', name:'SWITCH', emoji:'🎭', tagline:'ANALISTA DE DATOS', color:'#d4af37',
+    photo:'/agent-photos/switch.png',
+    code:['$ curl -s api/data','> grep "status"','> jq .result','> encontrado: target','> next_query()','> listo en 1.2s'],
+    quotes:['"Máximo valor, mínima fricción."','"Pregunta rápida respondida."','"Esto debería verlo Trinity."','"Cambiando de contexto..."','"Directo al grano."','"Aquí tienes el resultado."'] },
+  { id:'smith', name:'SMITH', emoji:'🔍', tagline:'QA ENGINEER · TESTER', color:'#d4af37',
+    photo:'/agent-photos/smith.png',
+    code:['> test_suite.run()','> assert resultado','> BUG: linea 127','> edge_case(inf)','> regresion: pasa','> severidad: ALTA'],
+    quotes:['"Bug encontrado. Severidad: Alta."','"Todo sistema tiene una falla."','"Nunca envíes un humano..."','"Uno menos. Quedan muchos."','"Esto no funciona como debería."','"Lo he roto. A propósito."'] },
+  { id:'oracle', name:'ORACLE', emoji:'🔮', tagline:'CIENTÍFICA DE DATOS', color:'#d4af37',
+    photo:'/agent-photos/oracle.png',
+    code:['> data.load_csv()','> analizar.tendencias()','> predecir(X, conf=87%)','> patron detectado','> insight extraido','> recomendar: accion'],
+    quotes:['"No predigo el futuro."','"Veo el patrón en los datos."','"Los datos hablan por sí solos."','"Ya sabes lo que hay que hacer."','"Confianza: alta."','"Correlación significativa detectada."'] },
   { id:'keymaker', name:'KEYMAKER', emoji:'🔑', tagline:'DEVOPS · HERRAMIENTAS', color:'#d4af37',
     photo:'/agent-photos/keymaker.png',
     code:['$ pip install tool','> class Keymaker:','>> def crear():','> args.parse()','> --help generado','> listo.'],
@@ -631,6 +659,10 @@ const agents = [
     photo:'/agent-photos/sati.png',
     code:['> palette = [#d4af37,#000]','> css.grid()','> @keyframes brillo','> font.weight(700)','> design.system()','> "hermoso"'],
     quotes:['"Cada detalle importa."','"Belleza con propósito."','"El color dirige la mirada."','"Yo creé este mundo visual."','"Menos es más."','"Diseño completado."'] },
+  { id:'mouse', name:'MOUSE', emoji:'🧪', tagline:'PROTOTIPADOR · R&D', color:'#d4af37',
+    photo:'/agent-photos/mouse.png',
+    code:['$ spike test()','> hipotesis check','> experimento.run()','> resultado: FUNCIONA!','> next: produccion','> listo en 12min'],
+    quotes:['"Yo sé kung-fu!"','"Déjame probar algo!"','"Funciona. O no. Pero lo descubro."','"Falla rápido. Aprende más rápido."','"15 minutos o menos."','"Tres intentos. Esto es viable."'] },
   { id:'apoc', name:'APOC', emoji:'🛡️', tagline:'SYSADMIN · SOPORTE', color:'#d4af37',
     photo:'/agent-photos/apoc.png',
     code:['$ systemctl status','> cpu: 23% ram: 8G','> disco: 17% usado','> servicios: todo ok','> health_check()','> "todo nominal"'],
