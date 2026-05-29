@@ -165,14 +165,22 @@ class Handler(BaseHTTPRequestHandler):
                 if not isinstance(updates, list):
                     updates = [updates]
                 
-                # Read current status
-                with open(STATUS_FILE, 'r') as f:
-                    current = json.load(f)
+                # Read current status — handle corrupt entries gracefully
+                current = []
+                try:
+                    with open(STATUS_FILE, 'r') as f:
+                        raw = json.load(f)
+                        # Filter out entries without 'agent' key (safety)
+                        current = [s for s in raw if isinstance(s, dict) and 'agent' in s]
+                except:
+                    current = []
                 
                 # Apply updates
                 for update in updates:
-                    agent_id = update.get('agent')
-                    existing = [s for s in current if s['agent'] == agent_id]
+                    if not isinstance(update, dict) or 'agent' not in update:
+                        continue  # skip invalid entries
+                    agent_id = update['agent']
+                    existing = [s for s in current if s.get('agent') == agent_id]
                     if existing:
                         existing[0].update(update)
                     else:
