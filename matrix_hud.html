@@ -82,6 +82,7 @@ body { padding-top: constant(safe-area-inset-top, 0px); padding-top: env(safe-ar
 .agent-card.active .agent-name { color:var(--gold); text-shadow:0 0 10px rgba(212,175,55,0.4); }
 .agent-tagline { font-size:10px; color:#ffffff; letter-spacing:1px; text-transform:uppercase; opacity:0.7; }
 .agent-status { font-size:7px; padding:1px 5px; border-radius:8px; text-transform:uppercase; letter-spacing:1px; margin-left:auto; flex-shrink:0; }
+.provider-badge { display:inline; font-size:10px; font-weight:900; color:#ffd700; text-shadow:0 0 10px rgba(255,215,0,0.5); letter-spacing:0; margin-left:2px; }
 .agent-progress-row { text-align:center; padding:1px 0; flex-shrink:0; }
 .agent-progress-row .pct { font-size:24px; font-weight:900; font-family:'Orbitron',monospace; letter-spacing:2px; text-shadow:0 0 20px rgba(212,175,55,0.25); line-height:1; }
 .status-idle { color:rgba(255,255,255,0.25); border:1px solid rgba(255,255,255,0.06); }
@@ -733,7 +734,7 @@ function createCards() {
       <div class="shockwave"></div>
       <div class="text-box">
         <div class="agent-info">
-          <span class="agent-name" style="color:${agent.color}">${agent.name}</span>
+          <span class="agent-name" style="color:${agent.color}">${agent.id === 'neo' ? 'NEO ' : agent.name}${agent.id === 'neo' ? '<span id="neo-provider" class="provider-badge"></span>' : ''}</span>
           <span class="agent-tagline">${agent.tagline}</span>
           <span class="agent-status status-idle" id="status-${agent.id}">⏹</span>
         </div>
@@ -1197,9 +1198,13 @@ async function pollStatus() {
     if (!r.ok) return;
     const d = await r.json();
     if (Array.isArray(d)) d.forEach(u => {
-      if (!u.agent || !u.status) return;
-      // Comparar con último estado del servidor para evitar re-aplicar
+      // Mostrar badge de proveedor en NEO
+      if (u.agent === 'neo' && u.subtitle) {
+        const badgeEl = document.getElementById('neo-provider');
+        if (badgeEl) badgeEl.textContent = u.subtitle.toUpperCase();
+      }
       const key = u.agent;
+       // Comparar con último estado del servidor para evitar re-aplicar
       const prev = lastServerState[key];
       // First time seeing this agent? Log it
       if (!prev && u.status !== 'idle' && u.task) {

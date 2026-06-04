@@ -28,8 +28,17 @@ def build_status():
     agents = []
 
     # === NEO (yo — el agente) ===
-    agents.append({"agent": "neo", "status": "idle", "progress": 0,
-                   "task": "ONLINE", "subtitle": ""})
+    neo_task = tasks.get("neo", {})
+    if neo_task.get("status") == "working":
+        subtitle = neo_task.get("subtitle", "")
+        provider = neo_task.get("provider", "")
+        agents.append({"agent": "neo", "status": "working",
+                       "progress": neo_task.get("progress", 50),
+                       "task": neo_task.get("task", "TRABAJANDO..."),
+                       "subtitle": subtitle or provider})
+    else:
+        agents.append({"agent": "neo", "status": "idle", "progress": 0,
+                       "task": "ONLINE", "subtitle": ""})
 
     # === AGENTES DELEGABLES ===
     agent_list = ["morpheus", "trinity", "tank", "switch", "smith", "oracle", "keymaker", "sati", "mouse", "apoc"]
