@@ -1194,7 +1194,7 @@ function updateLog(agentId,task,status){
 // Poll — evitar re-animaciones comparando con último estado
 async function pollStatus() {
   try {
-    const r = await fetch('/status');
+    const r = await fetch('https://matrix-hud.onrender.com/status');
     if (!r.ok) return;
     const d = await r.json();
     if (Array.isArray(d)) d.forEach(u => {
@@ -1223,7 +1223,7 @@ setInterval(pollStatus,2000);
 // ===== TOKEN COST POLL =====
 async function pollTokenCost() {
   try {
-    const r = await fetch('/token-status');
+    const r = await fetch('https://matrix-hud.onrender.com/token-status');
     if (!r.ok) return;
     const d = await r.json();
     const today = d.today || {};
