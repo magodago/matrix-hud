@@ -104,11 +104,29 @@ def get_neo_state():
                 "subtitle": "DEEPSEEK V4 FLASH"}
     return {"status": "idle", "progress": 0, "task": "ONLINE", "subtitle": "DEEPSEEK V4 FLASH"}
 
+def get_delegation_goal(session_id):
+    """Lee el goal REAL de una delegación activa desde el live transcript
+    (más fiable que el título de state.db, que se rellena al terminar)."""
+    live_dir = Path("/home/dorti/.hermes/cache/delegation/live")
+    try:
+        if live_dir.exists():
+            for tdir in live_dir.iterdir():
+                if not tdir.is_dir():
+                    continue
+                for logf in tdir.glob("task-*.log"):
+                    head = logf.read_text(errors="ignore")[:400]
+                    for line in head.splitlines():
+                        if line.startswith("goal:"):
+                            return line[5:].strip()[:120]
+    except Exception:
+        pass
+    return None
+
 def get_subagents_state():
     """Delegaciones de subagentes activas o terminadas hace <45 min."""
     cutoff = now_ts() - 3 * 3600
     rows = query_db("""
-        SELECT title, started_at, ended_at, message_count, parent_session_id
+        SELECT id, title, started_at, ended_at, message_count, parent_session_id
         FROM sessions WHERE source='subagent' AND started_at > ?
         ORDER BY started_at DESC
     """, (cutoff,))
@@ -116,9 +134,12 @@ def get_subagents_state():
     for r in rows:
         active = r["ended_at"] is None
         age = now_ts() - (r["started_at"] or 0)
-        role = classify_role(r["title"])
+        title = r["title"]
+        if not title:
+            title = get_delegation_goal(r["id"])
+        role = classify_role(title)
         entry = {
-            "title": (r["title"] or "tarea delegada")[:70],
+            "title": (title or "tarea delegada")[:70],
             "active": active,
             "age_min": int(age / 60),
             "msgs": r["message_count"] or 0,
