@@ -122,8 +122,56 @@ def get_delegation_goal(session_id):
         pass
     return None
 
+def get_live_delegations():
+    """Delegaciones ACTIVAS ahora mismo — detectadas por live transcripts
+    recientes en cache/delegation/live/. Un directorio con actividad en los
+    últimos 3 min = subagente trabajando en este momento."""
+    live_dir = Path("/home/dorti/.hermes/cache/delegation/live")
+    out = []
+    if not live_dir.exists():
+        return out
+    now = time.time()
+    try:
+        for tdir in live_dir.iterdir():
+            if not tdir.is_dir():
+                continue
+            try:
+                mtime = tdir.stat().st_mtime
+            except Exception:
+                continue
+            if now - mtime > 180:
+                continue  # sin actividad reciente = terminada
+            goal = None
+            for logf in tdir.glob("task-*.log"):
+                head = logf.read_text(errors="ignore")[:500]
+                for line in head.splitlines():
+                    if line.startswith("goal:"):
+                        goal = line[5:].strip()[:120]
+                        break
+                if goal:
+                    break
+            if goal:
+                out.append(goal)
+    except Exception as e:
+        log(f"live delegations error: {e}")
+    return out
+
 def get_subagents_state():
-    """Delegaciones de subagentes activas o terminadas hace <45 min."""
+    """Delegaciones de subagentes activas o terminadas hace <45 min.
+    Prioridad: live transcripts (activas AHORA) > state.db (recientes)."""
+    # 1) Activas ahora mismo (filesystem)
+    live_goals = get_live_delegations()
+    live_roles = {}
+    for goal in live_goals:
+        role = classify_role(goal)
+        live_roles[role] = {
+            "status": "working",
+            "progress": 100,
+            "task": goal[:70],
+            "subtitle": "en marcha · tiempo real",
+        }
+
+    # 2) Recientes desde state.db (para mostrar 'done')
     cutoff = now_ts() - 3 * 3600
     rows = query_db("""
         SELECT id, title, started_at, ended_at, message_count, parent_session_id
@@ -163,6 +211,9 @@ def get_subagents_state():
             "task": e["title"],
             "subtitle": f"{e['age_min']}min · {e['msgs']} msg",
         }
+    # 3) Los roles en marcha AHORA ganan sobre el histórico
+    for role, state in live_roles.items():
+        result[role] = state
     return result
 
 def get_apoc_state():
