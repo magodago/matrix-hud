@@ -36,6 +36,11 @@ def query_token_totals(since_ts):
 
 if __name__ == "__main__":
     today = query_token_totals(get_today_start())
+    # Alias de claves que espera el frontend del HUD (tokens_input/output/cache_read)
+    if "error" not in today:
+        today["tokens_input"] = today["input_tokens"]
+        today["tokens_output"] = today["output_tokens"]
+        today["tokens_cache_read"] = today["cache_read_tokens"]
     result = {"today": today, "timestamp": datetime.now(timezone.utc).isoformat()}
     with open(TOKEN_CACHE, "w") as f:
         json.dump(result, f)
