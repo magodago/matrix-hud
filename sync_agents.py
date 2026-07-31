@@ -123,46 +123,54 @@ def get_delegation_goal(session_id):
     return None
 
 def get_live_delegations():
-    """Delegaciones ACTIVAS ahora mismo — detectadas por live transcripts
-    recientes en cache/delegation/live/. Un directorio con actividad en los
-    últimos 3 min = subagente trabajando en este momento."""
+    """Delegaciones detectadas por live transcripts en cache/delegation/live/.
+    Lee manifest.json de cada una: tasks running = trabajando AHORA,
+    tasks completed hace <45 min = done reciente. Devuelve (working, done)."""
     live_dir = Path("/home/dorti/.hermes/cache/delegation/live")
-    out = []
+    working, done = [], []
     if not live_dir.exists():
-        return out
+        return working, done
     now = time.time()
     try:
         for tdir in live_dir.iterdir():
             if not tdir.is_dir():
                 continue
+            mf = tdir / "manifest.json"
+            if not mf.exists():
+                continue
             try:
-                mtime = tdir.stat().st_mtime
+                m = json.loads(mf.read_text(errors="ignore"))
             except Exception:
                 continue
-            if now - mtime > 180:
-                continue  # sin actividad reciente = terminada
-            goal = None
-            for logf in tdir.glob("task-*.log"):
-                head = logf.read_text(errors="ignore")[:500]
-                for line in head.splitlines():
-                    if line.startswith("goal:"):
-                        goal = line[5:].strip()[:120]
-                        break
-                if goal:
-                    break
-            if goal:
-                out.append(goal)
+            tasks = m.get("tasks", [])
+            for t in tasks:
+                goal = (t.get("goal") or "")[:120]
+                if not goal:
+                    continue
+                st = t.get("status", "")
+                if st == "running" or (not m.get("completed") and st != "completed"):
+                    working.append(goal)
+                elif st == "completed":
+                    done.append(goal)
+            # Tolerancia: delegación que acaba de terminar (sin 'completed' aún)
+            if not m.get("completed"):
+                # puede seguir corriendo: el manifest se escribe al final
+                try:
+                    if now - tdir.stat().st_mtime > 120:
+                        continue
+                except Exception:
+                    pass
     except Exception as e:
         log(f"live delegations error: {e}")
-    return out
+    return working, done
 
 def get_subagents_state():
     """Delegaciones de subagentes activas o terminadas hace <45 min.
     Prioridad: live transcripts (activas AHORA) > state.db (recientes)."""
-    # 1) Activas ahora mismo (filesystem)
-    live_goals = get_live_delegations()
+    # 1) Trabajando AHORA (manifest.json de delegaciones vivas)
+    live_working, live_done = get_live_delegations()
     live_roles = {}
-    for goal in live_goals:
+    for goal in live_working:
         role = classify_role(goal)
         live_roles[role] = {
             "status": "working",
