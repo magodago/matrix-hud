@@ -104,24 +104,6 @@ def get_neo_state():
                 "subtitle": "DEEPSEEK V4 FLASH"}
     return {"status": "idle", "progress": 0, "task": "ONLINE", "subtitle": "DEEPSEEK V4 FLASH"}
 
-def get_delegation_goal(session_id):
-    """Lee el goal REAL de una delegación activa desde el live transcript
-    (más fiable que el título de state.db, que se rellena al terminar)."""
-    live_dir = Path("/home/dorti/.hermes/cache/delegation/live")
-    try:
-        if live_dir.exists():
-            for tdir in live_dir.iterdir():
-                if not tdir.is_dir():
-                    continue
-                for logf in tdir.glob("task-*.log"):
-                    head = logf.read_text(errors="ignore")[:400]
-                    for line in head.splitlines():
-                        if line.startswith("goal:"):
-                            return line[5:].strip()[:120]
-    except Exception:
-        pass
-    return None
-
 def get_live_delegations():
     """Delegaciones detectadas por live transcripts en cache/delegation/live/.
     Lee manifest.json de cada una: tasks running = trabajando AHORA,
@@ -143,6 +125,13 @@ def get_live_delegations():
             except Exception:
                 continue
             tasks = m.get("tasks", [])
+            completed_ts = None
+            cstr = m.get("completed")
+            if cstr:
+                try:
+                    completed_ts = datetime.strptime(cstr, "%Y-%m-%d %H:%M:%S").timestamp()
+                except Exception:
+                    completed_ts = None
             for t in tasks:
                 goal = (t.get("goal") or "")[:120]
                 if not goal:
@@ -150,8 +139,8 @@ def get_live_delegations():
                 st = t.get("status", "")
                 if st == "running" or (not m.get("completed") and st != "completed"):
                     working.append(goal)
-                elif st == "completed":
-                    done.append(goal)
+                elif st == "completed" and completed_ts and now - completed_ts < 2700:
+                    done.append((goal, completed_ts))
             # Tolerancia: delegación que acaba de terminar (sin 'completed' aún)
             if not m.get("completed"):
                 # puede seguir corriendo: el manifest se escribe al final
@@ -167,19 +156,29 @@ def get_live_delegations():
 def get_subagents_state():
     """Delegaciones de subagentes activas o terminadas hace <45 min.
     Prioridad: live transcripts (activas AHORA) > state.db (recientes)."""
-    # 1) Trabajando AHORA (manifest.json de delegaciones vivas)
+    # 1) Trabajando AHORA + done recientes (manifest.json de delegaciones)
     live_working, live_done = get_live_delegations()
-    live_roles = {}
+    result = {}
     for goal in live_working:
         role = classify_role(goal)
-        live_roles[role] = {
+        result[role] = {
             "status": "working",
             "progress": 100,
             "task": goal[:70],
             "subtitle": "en marcha · tiempo real",
         }
+    for goal, ts in live_done:
+        role = classify_role(goal)
+        mins = max(1, int((now_ts() - ts) / 60))
+        if role not in result or result[role]["status"] != "working":
+            result[role] = {
+                "status": "done",
+                "progress": 100,
+                "task": goal[:70],
+                "subtitle": f"completado · hace {mins}min",
+            }
 
-    # 2) Recientes desde state.db (para mostrar 'done')
+    # 2) Recientes desde state.db SOLO para roles no cubiertos por el manifest
     cutoff = now_ts() - 3 * 3600
     rows = query_db("""
         SELECT id, title, started_at, ended_at, message_count, parent_session_id
@@ -191,8 +190,6 @@ def get_subagents_state():
         active = r["ended_at"] is None
         age = now_ts() - (r["started_at"] or 0)
         title = r["title"]
-        if not title:
-            title = get_delegation_goal(r["id"])
         role = classify_role(title)
         entry = {
             "title": (title or "tarea delegada")[:70],
@@ -201,8 +198,9 @@ def get_subagents_state():
             "msgs": r["message_count"] or 0,
         }
         assigned.setdefault(role, []).append(entry)
-    result = {}
     for role in ALL_ROLES:
+        if role in result:
+            continue  # el manifest ya lo cubre con datos exactos
         entries = assigned.get(role, [])
         if not entries:
             continue
@@ -219,9 +217,6 @@ def get_subagents_state():
             "task": e["title"],
             "subtitle": f"{e['age_min']}min · {e['msgs']} msg",
         }
-    # 3) Los roles en marcha AHORA ganan sobre el histórico
-    for role, state in live_roles.items():
-        result[role] = state
     return result
 
 def get_apoc_state():
