@@ -1,95 +1,96 @@
 #!/usr/bin/env python3
 """
-Matrix Agent Watcher — Daemon de fondo que actualiza el HUD cada 2s.
-CERO tokens — solo scripts, sin LLM.
+Matrix Agent Watcher v2 — REALTIME.
+Vigila las fuentes REALES de actividad de Hermes:
+  - cache/delegation/live/*/manifest.json  (delegaciones de subagentes)
+  - ~/.hermes/state.db                     (sesiones telegram/cron/subagent)
+Cuando algo cambia → ejecuta sync_agents.py al instante (POST a Render).
+
+CERO tokens. El cron de 1 min (Matrix Agent Monitor) y hud-watchdog.sh
+quedan como respaldo si este proceso muere.
 """
-import json, subprocess, time, urllib.request
-from datetime import datetime, timezone
+import json, sqlite3, subprocess, time
+from datetime import datetime
 from pathlib import Path
 
-HUD_URL = "https://matrix-hud.onrender.com/update"
-TASK_FILE = Path("/tmp/matrix_agent_tasks.json")
+LIVE_DIR = Path("/home/dorti/.hermes/cache/delegation/live")
+STATE_DB = Path("/home/dorti/.hermes/state.db")
+SYNC = "/home/dorti/matrix-hud/sync_agents.py"
+POLL_S = 2.0          # frecuencia de vigilancia
+HEARTBEAT_S = 30      # sync mínimo aunque no haya cambios
 LOG_FILE = Path("/tmp/matrix_watcher.log")
 
-log_fh = open(LOG_FILE, "a", buffering=1)
 def log(msg):
-    t = datetime.now().strftime("%H:%M:%S")
-    log_fh.write(f"[{t}] {msg}\n")
-    log_fh.flush()
-
-def read_tasks():
     try:
-        with open(TASK_FILE) as f:
-            return json.load(f)
-    except: return {}
+        with open(LOG_FILE, "a") as f:
+            f.write(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}\n")
+    except Exception:
+        pass
 
-def build_status():
-    tasks = read_tasks()
-    agents = []
-
-    # === NEO (yo — el agente) ===
-    neo_task = tasks.get("neo", {})
-    if neo_task.get("status") == "working":
-        subtitle = neo_task.get("subtitle", "")
-        provider = neo_task.get("provider", "")
-        agents.append({"agent": "neo", "status": "working",
-                       "progress": neo_task.get("progress", 50),
-                       "task": neo_task.get("task", "TRABAJANDO..."),
-                       "subtitle": subtitle or provider})
-    else:
-        agents.append({"agent": "neo", "status": "idle", "progress": 0,
-                       "task": "ONLINE", "subtitle": ""})
-
-    # === AGENTES DELEGABLES ===
-    agent_list = ["morpheus", "trinity", "tank", "switch", "smith", "oracle", "keymaker", "sati", "mouse", "apoc"]
-    for aid in agent_list:
-        t = tasks.get(aid, {})
-        if t.get("status") == "working":
-            agents.append({
-                "agent": aid, "status": "working",
-                "progress": t.get("progress", 50),
-                "task": t.get("task", "TRABAJANDO..."),
-                "subtitle": t.get("subtitle", "")
-            })
-        else:
-            agents.append({
-                "agent": aid, "status": "idle", "progress": 0,
-                "task": "", "subtitle": ""
-            })
-
-    return agents
-
-def read_token_data():
-    """Lee cache de tokens si existe"""
+def manifest_snapshot():
+    """Huella de las delegaciones: dir → mtime máximo de sus archivos
+    (task-*.log se actualiza mientras corre; manifest.json al terminar)."""
+    snap = {}
+    if not LIVE_DIR.exists():
+        return snap
     try:
-        with open("/tmp/matrix_token_cache.json") as f:
-            return json.load(f)
-    except:
-        return None
+        for d in LIVE_DIR.iterdir():
+            if not d.is_dir():
+                continue
+            max_mt = 0.0
+            try:
+                for f in d.iterdir():
+                    try:
+                        max_mt = max(max_mt, f.stat().st_mtime)
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+            if max_mt > 0:
+                snap[d.name] = round(max_mt, 1)
+    except Exception:
+        pass
+    return snap
+
+def sessions_snapshot():
+    """Huella de las sesiones recientes: (source, title, activa) de las 6 últimas."""
+    try:
+        con = sqlite3.connect(f"file:{STATE_DB}?mode=ro", uri=True)
+        rows = con.execute("""
+            SELECT source, title, ended_at FROM sessions
+            WHERE started_at > ? ORDER BY started_at DESC LIMIT 6
+        """, (time.time() - 7200,)).fetchall()
+        con.close()
+        return rows
+    except Exception:
+        return []
+
+def run_sync(reason=""):
+    t0 = time.time()
+    try:
+        subprocess.run(["python3", SYNC], timeout=20,
+                       capture_output=True, check=False)
+        log(f"sync ({reason}) {time.time()-t0:.1f}s")
+    except Exception as e:
+        log(f"sync FAIL ({reason}): {e}")
 
 def main():
-    log("Watcher iniciado")
+    prev_m = manifest_snapshot()
+    prev_s = sessions_snapshot()
+    last_sync = time.time()
+    log(f"watcher v2 iniciado · {len(prev_m)} delegaciones · {len(prev_s)} sesiones")
+    run_sync("arranque")  # estado inicial al arrancar
     while True:
-        try:
-            agents = build_status()
-            data = json.dumps(agents).encode()
-            req = urllib.request.Request(HUD_URL, data=data,
-                headers={"Content-Type": "application/json"})
-            resp = urllib.request.urlopen(req, timeout=5)
-            result = json.loads(resp.read())
-            working = sum(1 for a in agents if a["status"] == "working")
-            log(f"📤 {working}/11 working → {result}")
-
-            # Token data si existe cache
-            token_data = read_token_data()
-            if token_data:
-                td = json.dumps(token_data).encode()
-                treq = urllib.request.Request(f"{HUD_URL.replace('/update', '/token-update')}",
-                    data=td, headers={"Content-Type": "application/json"})
-                urllib.request.urlopen(treq, timeout=5)
-        except Exception as e:
-            log(f"✗ {e}")
-        time.sleep(2)
+        time.sleep(POLL_S)
+        m = manifest_snapshot()
+        s = sessions_snapshot()
+        changed = (m != prev_m) or (s != prev_s)
+        if changed:
+            log(f"cambio detectado: deleg={len(m)} (antes {len(prev_m)}) ses={len(s)}")
+        prev_m, prev_s = m, s
+        if changed or (time.time() - last_sync > HEARTBEAT_S):
+            last_sync = time.time()
+            run_sync("cambio" if changed else "heartbeat")
 
 if __name__ == "__main__":
     main()

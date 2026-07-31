@@ -90,7 +90,7 @@ def get_neo_state():
         r = rows[0]
         model = r["model"] or "deepseek-v4-flash"
         task = r["title"] or "Sesión activa"
-        return {"status": "working", "progress": 100, "task": task[:80],
+        return {"status": "working", "progress": 100, "task": task[:90],
                 "subtitle": model.upper().replace("-", " ")[:24]}
     # Cron corriendo ahora mismo
     rows = query_db("""
@@ -100,14 +100,15 @@ def get_neo_state():
     """, (now_ts() - 3600,))
     if rows:
         return {"status": "working", "progress": 75,
-                "task": ("⏳ " + (rows[0]["title"] or "cron activo"))[:80],
+                "task": ("⏳ " + (rows[0]["title"] or "cron activo"))[:90],
                 "subtitle": "DEEPSEEK V4 FLASH"}
     return {"status": "idle", "progress": 0, "task": "ONLINE", "subtitle": "DEEPSEEK V4 FLASH"}
 
 def get_live_delegations():
     """Delegaciones detectadas por live transcripts en cache/delegation/live/.
-    Lee manifest.json de cada una: tasks running = trabajando AHORA,
-    tasks completed hace <45 min = done reciente. Devuelve (working, done)."""
+    WORKING: task-*.log con mtime reciente y SIN manifest.json todavía
+             (el manifest se escribe al terminar → sin él, sigue corriendo).
+    DONE:    manifest.json con completed hace <45 min."""
     live_dir = Path("/home/dorti/.hermes/cache/delegation/live")
     working, done = [], []
     if not live_dir.exists():
@@ -118,37 +119,40 @@ def get_live_delegations():
             if not tdir.is_dir():
                 continue
             mf = tdir / "manifest.json"
-            if not mf.exists():
+            mf_exists = mf.exists()
+            # Goal y mtime desde el task log (existe durante la ejecución)
+            goal, log_mtime = None, None
+            for logf in tdir.glob("task-*.log"):
+                try:
+                    log_mtime = logf.stat().st_mtime
+                except Exception:
+                    continue
+                head = logf.read_text(errors="ignore")[:500]
+                for line in head.splitlines():
+                    if line.startswith("goal:"):
+                        goal = line[5:].strip()[:120]
+                        break
+                if goal:
+                    break
+            if not goal:
                 continue
+            if not mf_exists:
+                # Sin manifest = el subagente sigue corriendo
+                if log_mtime and now - log_mtime < 90:
+                    working.append(goal)
+                continue
+            # Manifest existe → completada con timestamp
             try:
                 m = json.loads(mf.read_text(errors="ignore"))
-            except Exception:
-                continue
-            tasks = m.get("tasks", [])
-            completed_ts = None
-            cstr = m.get("completed")
-            if cstr:
-                try:
-                    completed_ts = datetime.strptime(cstr, "%Y-%m-%d %H:%M:%S").timestamp()
-                except Exception:
-                    completed_ts = None
-            for t in tasks:
-                goal = (t.get("goal") or "")[:120]
-                if not goal:
-                    continue
-                st = t.get("status", "")
-                if st == "running" or (not m.get("completed") and st != "completed"):
-                    working.append(goal)
-                elif st == "completed" and completed_ts and now - completed_ts < 2700:
+                cstr = m.get("completed")
+                completed_ts = None
+                if cstr:
+                    completed_ts = datetime.strptime(
+                        cstr, "%Y-%m-%d %H:%M:%S").timestamp()
+                if completed_ts and now - completed_ts < 2700:
                     done.append((goal, completed_ts))
-            # Tolerancia: delegación que acaba de terminar (sin 'completed' aún)
-            if not m.get("completed"):
-                # puede seguir corriendo: el manifest se escribe al final
-                try:
-                    if now - tdir.stat().st_mtime > 120:
-                        continue
-                except Exception:
-                    pass
+            except Exception:
+                pass
     except Exception as e:
         log(f"live delegations error: {e}")
     return working, done
@@ -164,19 +168,20 @@ def get_subagents_state():
         result[role] = {
             "status": "working",
             "progress": 100,
-            "task": goal[:70],
+            "task": goal[:90],
             "subtitle": "en marcha · tiempo real",
         }
-    for goal, ts in live_done:
+    for goal, ts in sorted(live_done, key=lambda x: -x[1]):
         role = classify_role(goal)
+        if role in result:
+            continue  # working o done más reciente ya asignado
         mins = max(1, int((now_ts() - ts) / 60))
-        if role not in result or result[role]["status"] != "working":
-            result[role] = {
-                "status": "done",
-                "progress": 100,
-                "task": goal[:70],
-                "subtitle": f"completado · hace {mins}min",
-            }
+        result[role] = {
+            "status": "done",
+            "progress": 100,
+            "task": goal[:90],
+            "subtitle": f"completado · hace {mins}min",
+        }
 
     # 2) Recientes desde state.db SOLO para roles no cubiertos por el manifest
     cutoff = now_ts() - 3 * 3600
@@ -192,7 +197,7 @@ def get_subagents_state():
         title = r["title"]
         role = classify_role(title)
         entry = {
-            "title": (title or "tarea delegada")[:70],
+            "title": (title or "tarea delegada")[:90],
             "active": active,
             "age_min": int(age / 60),
             "msgs": r["message_count"] or 0,
@@ -232,7 +237,7 @@ def get_apoc_state():
         task = "WATCHDOG · heartbeat " + datetime.now().strftime("%H:%M")
         if crons:
             task += " · " + (crons[0]["title"] or "cron")[:30]
-        return {"status": "working", "progress": 100, "task": task[:80],
+        return {"status": "working", "progress": 100, "task": task[:90],
                 "subtitle": "sistemas nominales"}
     return {"status": "idle", "progress": 0, "task": "SIN HEARTBEAT", "subtitle": ""}
 
@@ -247,7 +252,7 @@ def get_keymaker_state(sub_state):
     """, (now_ts() - 3600,))
     if crons:
         return {"status": "working", "progress": 100,
-                "task": ("⚙️ " + (crons[0]["title"] or "cron activo"))[:80],
+                "task": ("⚙️ " + (crons[0]["title"] or "cron activo"))[:90],
                 "subtitle": "automatización"}
     return {"status": "idle", "progress": 0, "task": "EN ESPERA", "subtitle": ""}
 
