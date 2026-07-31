@@ -77,19 +77,84 @@ def query_db(sql, params=()):
         log(f"DB error: {e}")
         return []
 
+def format_activity(tool, args):
+    """Convierte una tool call real en texto legible para el HUD."""
+    t = (tool or "").lower()
+    if t in ("patch", "write_file", "read_file", "writefile"):
+        p = args.get("path") or args.get("file_path") or ""
+        return f"✏️ {tool} → {Path(p).name if p else ''}"
+    if t == "terminal":
+        c = (args.get("command") or "")[:70]
+        return f"💻 {c}"
+    if t == "web_search":
+        return f"🔎 {(args.get('query') or '')[:60]}"
+    if t == "delegate_task":
+        g = args.get("goal") or args.get("tasks")
+        if isinstance(g, list):
+            g = g[0].get("goal", "") if g else ""
+        return f"🤖 delegando → {(str(g) or '')[:55]}"
+    if t == "web_extract":
+        u = args.get("urls") or []
+        return f"🌐 {(str(u[0]) if u else '')[:55]}"
+    if t == "cronjob":
+        return f"⏰ cron {args.get('action','')} {args.get('name','')}".strip()
+    if t in ("search_files", "skill_view", "skills_list"):
+        p = args.get("pattern") or args.get("name") or ""
+        return f"🔍 {t} {p}"
+    if t == "vision_analyze":
+        return f"👁 {(args.get('question') or '')[:50]}"
+    if t == "session_search":
+        return f"🧠 sesiones: {(args.get('query') or '')[:50]}"
+    # fallback: primer argumento útil
+    for k in ("path", "query", "goal", "command", "name", "url", "question"):
+        v = args.get(k)
+        if v:
+            if isinstance(v, list):
+                v = v[0]
+            return f"⚙️ {tool} {str(v)[:50]}".strip()
+    return f"⚙️ {tool}"
+
+def get_last_activity(session_id):
+    """Última acción REAL del asistente en la sesión → texto legible."""
+    rows = query_db("""
+        SELECT tool_name, tool_calls FROM messages
+        WHERE session_id=? AND role='assistant' AND tool_calls IS NOT NULL
+        ORDER BY timestamp DESC LIMIT 1
+    """, (session_id,))
+    if not rows:
+        return None
+    r = rows[0]
+    tool = r["tool_name"]
+    calls = r["tool_calls"]
+    try:
+        if isinstance(calls, str):
+            calls = json.loads(calls)
+        if calls and isinstance(calls, list):
+            fn = calls[0].get("function", {})
+            tool = fn.get("name", tool)
+            args = fn.get("arguments") or {}
+            if isinstance(args, str):
+                args = json.loads(args) if args else {}
+            return format_activity(tool, args)
+    except Exception:
+        pass
+    return f"⚙️ {tool}" if tool else None
+
 def get_neo_state():
-    """NEO = sesión activa con David (telegram) o cron corriendo."""
+    """NEO = sesión activa con David (telegram) o cron corriendo.
+    Muestra la ÚLTIMA ACCIÓN REAL del asistente, no el título de sesión."""
     cutoff = now_ts() - 6 * 3600
     # Sesión telegram activa más reciente
     rows = query_db("""
-        SELECT title, started_at, model, message_count FROM sessions
+        SELECT id, title, model FROM sessions
         WHERE source='telegram' AND ended_at IS NULL AND started_at > ?
         ORDER BY started_at DESC LIMIT 1
     """, (cutoff,))
     if rows:
         r = rows[0]
         model = r["model"] or "deepseek-v4-flash"
-        task = r["title"] or "Sesión activa"
+        activity = get_last_activity(r["id"])
+        task = activity or (r["title"] or "Sesión activa")
         return {"status": "working", "progress": 100, "task": task[:90],
                 "subtitle": model.upper().replace("-", " ")[:24]}
     # Cron corriendo ahora mismo

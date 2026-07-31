@@ -53,11 +53,12 @@ def manifest_snapshot():
     return snap
 
 def sessions_snapshot():
-    """Huella de las sesiones recientes: (source, title, activa) de las 6 últimas."""
+    """Huella de las sesiones recientes. message_count cambia con cada
+    tool call → el watcher dispara sync en cada acción de NEO."""
     try:
         con = sqlite3.connect(f"file:{STATE_DB}?mode=ro", uri=True)
         rows = con.execute("""
-            SELECT source, title, ended_at FROM sessions
+            SELECT source, title, ended_at, message_count FROM sessions
             WHERE started_at > ? ORDER BY started_at DESC LIMIT 6
         """, (time.time() - 7200,)).fetchall()
         con.close()

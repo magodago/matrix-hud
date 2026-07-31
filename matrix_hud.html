@@ -1211,6 +1211,11 @@ async function pollStatus() {
         const a = agents.find(x => x.id === u.agent);
         if (a) addTaskLog(a.name, a.emoji, u.task);
       }
+      if (prev && prev.task !== u.task && u.task && u.status !== 'idle') {
+        // La tarea cambió → registrar en el log de actividad
+        const a = agents.find(x => x.id === u.agent);
+        if (a) addTaskLog(a.name, a.emoji, u.task);
+      }
       if (prev && prev.status === u.status && prev.progress === u.progress && prev.task === u.task) return;
       lastServerState[key] = { status: u.status, progress: u.progress, task: u.task };
       updateAgent(u.agent, u.status, u.task || '', '', u.progress || 0, true);
